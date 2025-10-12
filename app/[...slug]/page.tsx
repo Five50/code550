@@ -110,6 +110,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     const { content, type } = result;
 
+    if (!content) {
+      return {};
+    }
+
     // Use RankMath SEO data if available, fallback to WordPress data
     const title = content.seo?.title || content.title.rendered;
     const description = content.seo?.description ||
