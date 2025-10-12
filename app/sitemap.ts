@@ -1,9 +1,13 @@
 import { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/wordpress";
+import { getAllPosts, getAllPages } from "@/lib/wordpress";
 import { siteConfig } from "@/site.config";
+import { supportedLanguages } from "@/middleware";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts();
+  const [posts, pages] = await Promise.all([
+    getAllPosts(),
+    getAllPages()
+  ]);
 
   const staticUrls: MetadataRoute.Sitemap = [
     {
@@ -13,43 +17,64 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${siteConfig.site_domain}/posts`,
+      url: `${siteConfig.site_domain}/posts/archive`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${siteConfig.site_domain}/pages`,
+      url: `${siteConfig.site_domain}/posts/categories`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${siteConfig.site_domain}/authors`,
+      url: `${siteConfig.site_domain}/posts/authors`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${siteConfig.site_domain}/categories`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${siteConfig.site_domain}/tags`,
+      url: `${siteConfig.site_domain}/posts/tags`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     },
   ];
 
-  const postUrls: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${siteConfig.site_domain}/posts/${post.slug}`,
-    lastModified: new Date(post.modified),
-    changeFrequency: "weekly",
-    priority: 0.5,
-  }));
+  // Generate URLs for posts in WordPress style (direct slug)
+  const postUrls: MetadataRoute.Sitemap = [];
+  posts.forEach((post) => {
+    supportedLanguages.forEach((lang) => {
+      const url = lang === 'en'
+        ? `${siteConfig.site_domain}/${post.slug}`
+        : `${siteConfig.site_domain}/${lang}/${post.slug}`;
 
-  return [...staticUrls, ...postUrls];
+      postUrls.push({
+        url,
+        lastModified: new Date(post.modified),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+    });
+  });
+
+  // Generate URLs for pages in WordPress style (direct slug)
+  const pageUrls: MetadataRoute.Sitemap = [];
+  pages.forEach((page) => {
+    supportedLanguages.forEach((lang) => {
+      const url = lang === 'en'
+        ? `${siteConfig.site_domain}/${page.slug}`
+        : `${siteConfig.site_domain}/${lang}/${page.slug}`;
+
+      pageUrls.push({
+        url,
+        lastModified: new Date(page.modified),
+        changeFrequency: "monthly",
+        priority: 0.6,
+      });
+    });
+  });
+
+  return [...staticUrls, ...postUrls, ...pageUrls];
 }

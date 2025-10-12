@@ -1,149 +1,223 @@
-// Craft Imports
-import { Section, Container, Prose } from "@/components/craft";
+import {Section, Container, Article} from "@/components/craft";
+import {PostCard} from "@/components/posts/post-card";
+import {HeaderSettings} from "@/components/header-settings";
+import {getFrontPageContent, getPostsPaginated, isNoTitleTemplate} from "@/lib/wordpress";
 import Balancer from "react-wrap-balancer";
-
-// Next.js Imports
 import Link from "next/link";
+import type {Metadata} from "next";
 
-// Icons
-import { File, Pen, Tag, Diamond, User, Folder } from "lucide-react";
-import { WordPressIcon } from "@/components/icons/wordpress";
-import { NextJsIcon } from "@/components/icons/nextjs";
+export async function generateMetadata(): Promise<Metadata> {
+    try {
+        const frontPage = await getFrontPageContent();
 
-// This page is using the craft.tsx component and design system
-export default function Home() {
-  return (
-    <Section>
-      <Container>
-        <ToDelete />
-      </Container>
-    </Section>
-  );
+        if (frontPage.type === 'page' && frontPage.content) {
+            return {
+                title: frontPage.content.title.rendered,
+                description: frontPage.content.excerpt?.rendered?.replace(/<[^>]*>/g, "").trim() || frontPage.settings.blogdescription,
+            };
+        }
+
+        return {
+            title: frontPage.settings.blogname || "AltoFuel",
+            description: frontPage.settings.blogdescription || "Latest posts and updates",
+        };
+    } catch (error) {
+        return {
+            title: "AltoFuel",
+            description: "Welcome to our website",
+        };
+    }
 }
 
-// This is just some example TSX
+export default async function Home() {
+    // Show landing page in production temporarily
+    const isProduction = true; // process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+        return <FallbackHomepage/>;
+    }
+
+    try {
+        const frontPage = await getFrontPageContent();
+
+        if (frontPage.type === 'page' && frontPage.content) {
+            // Static front page
+            const shouldHideTitle = isNoTitleTemplate(frontPage.content);
+            const isFixedHeader = isNoTitleTemplate(frontPage.content);
+
+            return (
+                <>
+                    <HeaderSettings isFixedPosition={isFixedHeader}/>
+                    <Section>
+                        <Container>
+                            {!shouldHideTitle && (
+                                <div>
+                                    <h1>
+                                        <Balancer>
+                                            <span dangerouslySetInnerHTML={{__html: frontPage.content.title.rendered}}/>
+                                        </Balancer>
+                                    </h1>
+                                </div>
+                            )}
+                            <Article dangerouslySetInnerHTML={{__html: frontPage.content.content.rendered}}/>
+                        </Container>
+                    </Section>
+                </>
+            );
+        }
+
+        // Blog front page - show latest posts
+        const {data: posts} = await getPostsPaginated(1, 6);
+
+        return (
+            <>
+                <HeaderSettings isFixedPosition={false}/>
+                <Section>
+                    <Container>
+                        <div className="flex flex-col gap-8">
+                            <div className="text-center">
+                                <h1 className="text-4xl font-bold mb-4">
+                                    <Balancer>{frontPage.settings.blogname || "Latest Posts"}</Balancer>
+                                </h1>
+                                {frontPage.settings.blogdescription && (
+                                    <p className="text-lg text-muted-foreground">
+                                        <Balancer>{frontPage.settings.blogdescription}</Balancer>
+                                    </p>
+                                )}
+                            </div>
+
+                            {posts.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {posts.map((post) => (
+                                        <PostCard key={post.id} post={post}/>
+                                    ))}
+                                </div>
+                            ) : (
+                                <FallbackHomepage/>
+                            )}
+
+                            {posts.length > 0 && (
+                                <div className="text-center">
+                                    <Link
+                                        href="/blog"
+                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-600 h-10 px-4 py-2"
+                                    >
+                                        View All Posts
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    </Container>
+                </Section>
+            </>
+        );
+    } catch (error) {
+        console.error("Error loading front page:", error);
+        return <FallbackHomepage/>;
+    }
+}
+
+// Fallback component when WordPress is not available
+function FallbackHomepage() {
+    return <ToDelete/>;
+}
+
+// AltoFuel Homepage Content
 const ToDelete = () => {
-  return (
-    <main className="space-y-6">
-      <Prose>
-        <h1>
-          <Balancer>Headless WordPress built with the Next.js</Balancer>
-        </h1>
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-900">
+            {/* Main Content */}
+            <main className="flex-1 flex items-center justify-center px-4">
+                <div className="max-w-4xl mx-auto text-center space-y-8 py-20">
+                    <div className="flex items-center justify-center">
+                        <svg
+                            width="240"
+                            height="60"
+                            viewBox="0 0 1000 240"
+                            className="transition-colors duration-300"
+                        >
+                            <g>
+                                <path
+                                    d="M66.09,197.86h-26.09l49.77-86.78c.57,0,1.04,1.07,1.32,1.51,4.13,6.55,7.57,13.78,11.72,20.34l.11.91-36.83,64.02Z"
+                                    fill="#2b7fff"/>
+                                <path
+                                    d="M110.61,120.44l-.63-.36c-3.48-6.9-8.08-13.29-11.61-20.15-.29-.56-.85-1.34-.76-1.96l32.51-56.56.76-.65,12.21,20.97.37,1.5-32.86,57.22Z"
+                                    fill="#2b7fff"/>
+                                <path
+                                    d="M80.55,197.86l29.92-51.62,12.88,22.55c-5.45,9.78-10.97,19.55-16.85,29.07h-25.95Z"
+                                    fill="#2b7fff"/>
+                                <path
+                                    d="M163.52,97.18c-2.22-4.79-6.14-10.79-8.9-15.49-.34-.58-3.39-6-3.73-5.76l-12.82,22.47,13,22.51,12.81-22.51c.11-.48-.18-.83-.37-1.22Z"
+                                    fill="#2b7fff"/>
+                                <polygon
+                                    points="221.5 197.86 195.41 197.86 158.59 133.85 158.76 132.72 171.31 110.8 221.5 197.86"
+                                    fill="white"/>
+                                <polygon points="150.92 145.86 137.9 168.42 154.57 197.58 180.66 197.58 150.92 145.86"
+                                         fill="white"/>
+                                <polygon points="130.82 111.11 117.99 133.61 130.83 156.05 143.8 133.58 130.82 111.11"
+                                         fill="white"/>
+                            </g>
+                            <g>
+                                <path
+                                    d="M269.02,197.86l40.33-119.09h32.89l40.33,119.09h-25.27l-8.65-26.31h-46.56l-8.48,26.31h-24.58ZM308.31,151.65h33.93l-16.44-50.54h-1.04l-16.44,50.54Z"
+                                    fill="white"/>
+                                <path d="M402.65,197.86V69.26h23.02v128.61h-23.02Z" fill="white"/>
+                                <path
+                                    d="M463.75,197.86v-69.76h-16.96v-18.52h16.96v-25.62h23.02v25.62h20.08v18.52h-20.08v69.76h-23.02Z"
+                                    fill="white"/>
+                                <path
+                                    d="M564.49,199.25c-7.5,0-13.76-.46-18.78-1.38-5.02-.92-9-2.42-11.94-4.5-2.94-2.08-5.11-4.85-6.49-8.31-1.38-3.46-2.25-7.79-2.6-12.98s-.52-11.36-.52-18.52.17-13.3.52-18.43c.35-5.13,1.21-9.43,2.6-12.9s3.55-6.23,6.49-8.31c2.94-2.08,6.92-3.55,11.94-4.41,5.02-.87,11.28-1.3,18.78-1.3s14.11.43,19.13,1.3c5.02.87,9,2.34,11.94,4.41s5.08,4.85,6.4,8.31c1.33,3.46,2.19,7.76,2.6,12.9.4,5.14.61,11.28.61,18.43s-.2,13.33-.61,18.52c-.41,5.19-1.27,9.52-2.6,12.98-1.33,3.46-3.46,6.23-6.4,8.31-2.94,2.08-6.92,3.58-11.94,4.5-5.02.92-11.4,1.38-19.13,1.38ZM564.49,180.73c4.38,0,7.82-.29,10.3-.87,2.48-.58,4.21-1.76,5.19-3.55.98-1.79,1.58-4.5,1.82-8.14.23-3.63.35-8.51.35-14.63s-.12-10.82-.35-14.45c-.23-3.63-.84-6.34-1.82-8.14-.98-1.79-2.71-2.94-5.19-3.46-2.48-.52-5.91-.78-10.3-.78s-7.62.26-10.04.78c-2.42.52-4.13,1.67-5.11,3.46-.98,1.79-1.59,4.5-1.82,8.14-.23,3.63-.35,8.45-.35,14.45s.11,10.99.35,14.63c.23,3.63.84,6.35,1.82,8.14.98,1.79,2.68,2.97,5.11,3.55,2.42.58,5.77.87,10.04.87Z"
+                                    fill="white"/>
+                                <path d="M637.88,197.86v-119.09h72.35v9.87h-61.27v46.73h54.87v9.69h-54.87v52.79h-11.08Z"
+                                      fill="white"/>
+                                <path
+                                    d="M769.25,199.25c-6.69,0-12.09-.67-16.18-1.99-4.1-1.33-7.24-3.35-9.43-6.06-2.19-2.71-3.66-6.26-4.41-10.65-.75-4.38-1.13-9.58-1.13-15.58v-55.39h10.56v52.1c0,6.12.29,11.05.87,14.8.58,3.75,1.73,6.58,3.46,8.48,1.73,1.9,4.21,3.18,7.44,3.81,3.23.64,7.44.95,12.64.95,6.46,0,11.51-.84,15.15-2.51,3.63-1.67,6.26-4.04,7.88-7.10,1.61-3.06,2.62-6.69,3.03-10.9.4-4.21.61-8.85.61-13.93v-45.7h10.56v88.28h-9.35l-.52-13.5h-.87c-1.04,2.77-2.66,5.28-4.85,7.53-2.19,2.25-5.34,4.04-9.43,5.37-4.1,1.33-9.43,1.99-16.01,1.99Z"
+                                    fill="white"/>
+                                <path
+                                    d="M882.11,199.25c-6.92,0-12.7-.43-17.31-1.3-4.62-.87-8.37-2.34-11.25-4.41-2.89-2.08-5.05-4.87-6.49-8.39-1.44-3.52-2.42-7.85-2.94-12.98-.52-5.13-.78-11.22-.78-18.26,0-8.42.35-15.55,1.04-21.38.69-5.83,2.22-10.53,4.59-14.11,2.36-3.58,6.17-6.17,11.42-7.79,5.25-1.61,12.43-2.42,21.55-2.42,6.58,0,11.97.49,16.18,1.47,4.21.98,7.56,2.54,10.04,4.67,2.48,2.14,4.3,4.99,5.45,8.57,1.15,3.58,1.9,7.91,2.25,12.98.35,5.08.52,11.02.52,17.83v3.63h-62.49c0,6.69.32,12.18.95,16.44.63,4.27,1.9,7.62,3.81,10.04,1.9,2.42,4.9,4.1,9,5.02,4.09.92,9.61,1.38,16.53,1.38,2.88,0,6.06-.11,9.52-.35,3.46-.23,6.86-.49,10.21-.78,3.35-.29,6.34-.66,9-1.13v8.83c-2.31.46-5.19.9-8.65,1.3-3.46.4-7.10.69-10.9.87s-7.56.26-11.25.26ZM906.17,152.34v-5.71c0-6.58-.41-11.83-1.21-15.75-.81-3.92-2.14-6.86-3.98-8.83-1.85-1.96-4.36-3.26-7.53-3.89-3.18-.63-7.18-.95-12.03-.95-6.12,0-11.02.41-14.71,1.21-3.69.81-6.46,2.34-8.31,4.59-1.85,2.25-3.06,5.45-3.63,9.61-.58,4.15-.87,9.69-.87,16.62h55.56l-3.29,3.12Z"
+                                    fill="white"/>
+                                <path d="M949.44,197.86V69.26h10.56v128.61h-10.56Z" fill="white"/>
+                            </g>
+                        </svg>
+                    </div>
 
-        <p>
-          This is <a href="https://github.com/9d8dev/next-wp">next-wp</a>,
-          created as a way to build WordPress sites with Next.js at rapid speed.
-          This starter is designed with{" "}
-          <a href="https://ui.shadcn.com">shadcn/ui</a>,{" "}
-          <a href="https://craft-ds.com">craft-ds</a>, and Tailwind CSS. Use{" "}
-          <a href="https://components.work">brijr/components</a> to build your
-          site with prebuilt components. The data fetching and typesafety is
-          handled in <code>lib/wordpress.ts</code> and{" "}
-          <code>lib/wordpress.d.ts</code>.
-        </p>
-      </Prose>
+                    {/* Hero Section */}
+                    <div className="space-y-6">
+                        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight">
+                            <Balancer>Next Generation Alternative Fuel Intelligence</Balancer>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto">
+                            <Balancer>
+                                Advanced analytics and insights for the alternative fuel industry.
+                                Powered by real-time data and industry expertise.
+                            </Balancer>
+                        </p>
+                    </div>
 
-      <div className="flex justify-between items-center gap-4">
-        {/* Vercel Clone Starter */}
-        <div className="flex items-center gap-3">
-          <a
-            className="h-auto block"
-            href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F9d8dev%2Fnext-wp&env=WORDPRESS_URL,WORDPRESS_HOSTNAME&envDescription=Add%20WordPress%20URL%20with%20Rest%20API%20enabled%20(ie.%20https%3A%2F%2Fwp.example.com)%20abd%20the%20hostname%20for%20Image%20rendering%20in%20Next%20JS%20(ie.%20wp.example.com)&project-name=next-wp&repository-name=next-wp&demo-title=Next%20JS%20and%20WordPress%20Starter&demo-url=https%3A%2F%2Fwp.9d8.dev"
-          >
-            {/* eslint-disable-next-line */}
-            <img
-              className="not-prose my-4"
-              src="https://vercel.com/button"
-              alt="Deploy with Vercel"
-              width={105}
-              height={32.62}
-            />
-          </a>
-          <p className="!text-sm sr-only sm:not-sr-only text-muted-foreground">
-            Deploy with Vercel in seconds.
-          </p>
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                        <a
+                            href="https://app.altofuel.com"
+                            className="inline-flex items-center justify-center rounded-lg text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 border border-blue-500 transition-colors h-12 px-8"
+                        >
+                            Access Platform
+                        </a>
+                        <a
+                            href="mailto:info@altofuel.com"
+                            className="inline-flex items-center justify-center rounded-lg text-base font-semibold border border-slate-700/20 bg-slate-800/50 text-white hover:bg-slate-800 transition-colors h-12 px-8"
+                        >
+                            Contact Sales
+                        </a>
+                    </div>
+                </div>
+            </main>
+
+            {/* Footer */}
+            <footer className="py-6 px-4 border-t border-slate-800">
+                <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
+                    <p>&copy; 2025 AltoFuel. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
-
-        <div className="flex gap-2 items-center">
-          <WordPressIcon className="text-foreground" width={32} height={32} />
-          <NextJsIcon className="text-foreground" width={32} height={32} />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4 mt-6">
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts"
-        >
-          <Pen size={32} />
-          <span>
-            Posts{" "}
-            <span className="block text-sm text-muted-foreground">
-              All posts from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/pages"
-        >
-          <File size={32} />
-          <span>
-            Pages{" "}
-            <span className="block text-sm text-muted-foreground">
-              Custom pages from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/authors"
-        >
-          <User size={32} />
-          <span>
-            Authors{" "}
-            <span className="block text-sm text-muted-foreground">
-              List of the authors from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/tags"
-        >
-          <Tag size={32} />
-          <span>
-            Tags{" "}
-            <span className="block text-sm text-muted-foreground">
-              Content by tags from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/categories"
-        >
-          <Diamond size={32} />
-          <span>
-            Categories{" "}
-            <span className="block text-sm text-muted-foreground">
-              Categories from your WordPress
-            </span>
-          </span>
-        </Link>
-        <a
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="https://github.com/9d8dev/next-wp/blob/main/README.md"
-        >
-          <Folder size={32} />
-          <span>
-            Documentation{" "}
-            <span className="block text-sm text-muted-foreground">
-              How to use `next-wp`
-            </span>
-          </span>
-        </a>
-      </div>
-    </main>
-  );
+    );
 };

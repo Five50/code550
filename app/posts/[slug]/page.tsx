@@ -4,9 +4,11 @@ import {
   getAuthorById,
   getCategoryById,
   getAllPostSlugs,
+  isNoTitleTemplate,
+  isNoMetaTemplate,
 } from "@/lib/wordpress";
 
-import { Section, Container, Article, Prose } from "@/components/craft";
+import { Section, Container, Article } from "@/components/craft";
 import { badgeVariants } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/site.config";
@@ -82,37 +84,45 @@ export default async function Page({
   });
   const category = await getCategoryById(post.categories[0]);
 
+  // Check template settings
+  const shouldHideTitle = isNoTitleTemplate(post.template);
+  const shouldHideMeta = isNoMetaTemplate(post.template);
+
   return (
     <Section>
       <Container>
-        <Prose>
-          <h1>
-            <Balancer>
-              <span
-                dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-              ></span>
-            </Balancer>
-          </h1>
-          <div className="flex justify-between items-center gap-4 text-sm mb-4">
-            <h5>
-              Published {date} by{" "}
-              {author.name && (
-                <span>
-                  <a href={`/posts/?author=${author.id}`}>{author.name}</a>{" "}
-                </span>
-              )}
-            </h5>
+        <div className="">
+          {!shouldHideTitle && (
+            <h1>
+              <Balancer>
+                <span
+                  dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                ></span>
+              </Balancer>
+            </h1>
+          )}
+          {!shouldHideMeta && (
+            <div className="flex justify-between items-center gap-4 text-sm mb-4">
+              <h5>
+                Published {date} by{" "}
+                {author.name && (
+                  <span>
+                    <a href={`/posts/?author=${author.id}`}>{author.name}</a>{" "}
+                  </span>
+                )}
+              </h5>
 
-            <Link
-              href={`/posts/?category=${category.id}`}
-              className={cn(
-                badgeVariants({ variant: "outline" }),
-                "!no-underline"
-              )}
-            >
-              {category.name}
-            </Link>
-          </div>
+              <Link
+                href={`/posts/?category=${category.id}`}
+                className={cn(
+                  badgeVariants({ variant: "outline" }),
+                  "!no-underline"
+                )}
+              >
+                {category.name}
+              </Link>
+            </div>
+          )}
           {featuredMedia?.source_url && (
             <div className="h-96 my-12 md:h-[500px] overflow-hidden flex items-center justify-center border rounded-lg bg-accent/25">
               {/* eslint-disable-next-line */}
@@ -123,7 +133,7 @@ export default async function Page({
               />
             </div>
           )}
-        </Prose>
+        </div>
 
         <Article dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
       </Container>

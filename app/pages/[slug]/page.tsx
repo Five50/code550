@@ -1,5 +1,5 @@
-import { getPageBySlug, getAllPages } from "@/lib/wordpress";
-import { Section, Container, Prose } from "@/components/craft";
+import { getPageBySlug, getAllPages, isNoTitleTemplate } from "@/lib/wordpress";
+import { Section, Container } from "@/components/craft";
 import { siteConfig } from "@/site.config";
 
 import type { Metadata } from "next";
@@ -72,13 +72,18 @@ export default async function Page({
   const { slug } = await params;
   const page = await getPageBySlug(slug);
 
+  // Check if the page uses a no-title template
+  const shouldHideTitle = isNoTitleTemplate(page.template);
+
   return (
     <Section>
       <Container>
-        <Prose>
-          <h2>{page.title.rendered}</h2>
+        <div className="">
+          {!shouldHideTitle && (
+            <h2>{page.title.rendered}</h2>
+          )}
           <div dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
-        </Prose>
+        </div>
       </Container>
     </Section>
   );

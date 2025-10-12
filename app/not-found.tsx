@@ -12,7 +12,7 @@ export default function NotFound() {
           <p className="mb-8">
             Sorry, the page you are looking for does not exist.
           </p>
-          <Button asChild className="not-prose mt-6">
+          <Button asChild className="mt-6">
             <Link href="/">Return Home</Link>
           </Button>
         </div>

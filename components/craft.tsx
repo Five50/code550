@@ -1,5 +1,5 @@
 // craft-ds, v0.3.2
-// This is a design system for building responsive layouts in React and handling prose
+// This is a design system for building responsive layouts in React
 
 import React from "react";
 import { type ClassValue, clsx } from "clsx";
@@ -178,28 +178,17 @@ const styles = {
     ],
   },
   layout: {
-    spacing: "[&>*+*]:mt-6",
-    article: "max-w-prose",
-    container: "max-w-5xl mx-auto p-6 sm:p-8",
-    section: "py-8 md:py-12",
+    spacing: "",
+    article: "",
+    container: "container mx-auto",
+    section: "",
   },
 };
 
 // Combine all typography styles
-const baseTypographyStyles = [
-  ...styles.typography.base,
-  ...styles.typography.links,
-  ...styles.typography.lists,
-  ...styles.typography.code,
-  ...styles.typography.tables,
-  ...styles.typography.media,
-  ...styles.typography.misc,
-];
+const baseTypographyStyles = "";
 
-const articleTypographyStyles = [
-  ...baseTypographyStyles,
-  ...styles.typography.headerSpacing,
-];
+const articleTypographyStyles = "";
 
 // Components
 export const Layout = ({ children, className }: BaseProps) => (

@@ -1,3 +1,45 @@
+// Language support for WPML
+export interface Language {
+  id: number;
+  code: string;
+  english_name: string;
+  native_name: string;
+  country_flag_url: string;
+  language_flag_url: string;
+  default_locale: string;
+  encode_url: boolean;
+  tag: string;
+  translated_name: string;
+  url: string;
+  country_flag: string;
+  language_flag: string;
+}
+
+// WPML Translation information
+export interface WPMLTranslation {
+  element_id: number;
+  element_type: string;
+  trid: number;
+  language_code: string;
+  source_language_code: string | null;
+}
+
+// RankMath SEO data
+export interface RankMathSEO {
+  title?: string;
+  description?: string;
+  canonical_url?: string;
+  focus_keyword?: string;
+  robots?: string[];
+  og_title?: string;
+  og_description?: string;
+  og_image?: string;
+  twitter_title?: string;
+  twitter_description?: string;
+  twitter_image?: string;
+  schema?: string; // JSON-LD structured data
+}
+
 // Common types that are reused across multiple entities
 interface WPEntity {
   id: number;
@@ -11,6 +53,11 @@ interface WPEntity {
   guid: {
     rendered: string;
   };
+  // WPML fields
+  wpml_current_language?: string;
+  wpml_translations?: Record<string, WPMLTranslation>;
+  // RankMath SEO fields
+  rankmath_seo?: RankMathSEO;
 }
 
 interface RenderedContent {
@@ -229,4 +276,48 @@ export interface FilterBarProps {
   onAuthorChange?: (authorId: Author["id"] | undefined) => void;
   onTagChange?: (tagId: Tag["id"] | undefined) => void;
   onCategoryChange?: (categoryId: Category["id"] | undefined) => void;
+}
+
+// WordPress Menu Types
+export interface MenuItem {
+  id: number;
+  title: string;
+  url: string;
+  slug: string;
+  target: string;
+  classes: string[];
+  xfn: string;
+  description: string;
+  object_id: number;
+  object: string;
+  object_slug: string;
+  type: string;
+  type_label: string;
+  parent: number;
+  menu_order: number;
+  attr_title: string;
+  children?: MenuItem[];
+}
+
+export interface Menu {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  count: number;
+  items: MenuItem[];
+  meta: {
+    links: {
+      collection: string;
+      self: string;
+    };
+  };
+}
+
+export interface MenuLocation {
+  [key: string]: number; // Location slug => Menu ID
+}
+
+export interface MenusResponse {
+  [key: string]: Menu; // Menu slug => Menu object
 }
