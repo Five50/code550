@@ -56,24 +56,27 @@ export function MegaMenuContainer({ activeMenu, onClose }: MegaMenuContainerProp
                       {section.title}
                     </h4>
                     <div className="space-y-3">
-                      {Object.entries(section.items).map(([itemKey, item]) => (
-                        <a
-                          key={itemKey}
-                          href={item.href}
-                          className="block group"
-                        >
-                          <div className="p-3 rounded-md hover:bg-slate-800/50 transition-colors">
-                            <div className="font-medium text-slate-200 group-hover:text-white text-sm">
-                              {itemKey}
-                            </div>
-                            {item.description && (
-                              <div className="text-xs text-slate-400 mt-1">
-                                {item.description}
+                      {Object.entries(section.items).map(([itemKey, item]) => {
+                        const menuItem = item as { href: string; description?: string };
+                        return (
+                          <a
+                            key={itemKey}
+                            href={menuItem.href}
+                            className="block group"
+                          >
+                            <div className="p-3 rounded-md hover:bg-slate-800/50 transition-colors">
+                              <div className="font-medium text-slate-200 group-hover:text-white text-sm">
+                                {itemKey}
                               </div>
-                            )}
-                          </div>
-                        </a>
-                      ))}
+                              {menuItem.description && (
+                                <div className="text-xs text-slate-400 mt-1">
+                                  {menuItem.description}
+                                </div>
+                              )}
+                            </div>
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

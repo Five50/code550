@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
     // Show landing page in production temporarily
-    const isProduction = true; // process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
 
     if (isProduction) {
         return <FallbackHomepage/>;

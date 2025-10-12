@@ -4,23 +4,24 @@ import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 // Type for the View Transition API
-declare global {
-  interface Document {
-    startViewTransition?: (callback: () => void | Promise<void>) => {
-      finished: Promise<void>;
-      ready: Promise<void>;
-      updateCallbackDone: Promise<void>;
-    };
-  }
-}
+type ViewTransition = {
+  finished: Promise<void>;
+  ready: Promise<void>;
+  updateCallbackDone: Promise<void>;
+};
+
+type DocumentWithViewTransition = Document & {
+  startViewTransition?: (callback: () => void | Promise<void>) => ViewTransition;
+};
 
 export function useViewTransition() {
   const router = useRouter();
 
   const navigate = useCallback((url: string) => {
     // Check if the browser supports view transitions
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => {
+    const doc = document as DocumentWithViewTransition;
+    if (typeof document !== 'undefined' && doc.startViewTransition) {
+      doc.startViewTransition(() => {
         router.push(url);
       });
     } else {
@@ -30,8 +31,9 @@ export function useViewTransition() {
   }, [router]);
 
   const replace = useCallback((url: string) => {
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => {
+    const doc = document as DocumentWithViewTransition;
+    if (typeof document !== 'undefined' && doc.startViewTransition) {
+      doc.startViewTransition(() => {
         router.replace(url);
       });
     } else {
@@ -40,8 +42,9 @@ export function useViewTransition() {
   }, [router]);
 
   const back = useCallback(() => {
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => {
+    const doc = document as DocumentWithViewTransition;
+    if (typeof document !== 'undefined' && doc.startViewTransition) {
+      doc.startViewTransition(() => {
         router.back();
       });
     } else {
@@ -50,8 +53,9 @@ export function useViewTransition() {
   }, [router]);
 
   const forward = useCallback(() => {
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => {
+    const doc = document as DocumentWithViewTransition;
+    if (typeof document !== 'undefined' && doc.startViewTransition) {
+      doc.startViewTransition(() => {
         router.forward();
       });
     } else {
@@ -60,8 +64,9 @@ export function useViewTransition() {
   }, [router]);
 
   const refresh = useCallback(() => {
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => {
+    const doc = document as DocumentWithViewTransition;
+    if (typeof document !== 'undefined' && doc.startViewTransition) {
+      doc.startViewTransition(() => {
         router.refresh();
       });
     } else {
@@ -81,8 +86,9 @@ export function useViewTransition() {
 
 // Higher-order function to wrap any navigation function with view transitions
 export function withViewTransition(callback: () => void | Promise<void>) {
-  if (typeof document !== 'undefined' && document.startViewTransition) {
-    return document.startViewTransition(callback);
+  const doc = document as DocumentWithViewTransition;
+  if (typeof document !== 'undefined' && doc.startViewTransition) {
+    return doc.startViewTransition(callback);
   } else {
     // For browsers that don't support view transitions, just call the callback
     return Promise.resolve(callback());

@@ -853,7 +853,7 @@ function parseNavigationContent(html: string): MenuItem[] {
   // </li>
 
   // Match anchor tags with wp-block-navigation-item__content class
-  const linkRegex = /<a\s+[^>]*?class="[^"]*wp-block-navigation-item__content[^"]*"[^>]*?>(.*?)<\/a>/gs;
+  const linkRegex = /<a\s+[^>]*?class="[^"]*wp-block-navigation-item__content[^"]*"[^>]*?>([\s\S]*?)<\/a>/g;
   let match;
   let order = 1;
 
