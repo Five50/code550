@@ -173,18 +173,19 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 );
-              } else {
+              } else if ('href' in item) {
                 // Simple link without dropdown
                 return (
                   <TransitionLink
                     key={key}
-                    href={item.href!}
+                    href={item.href}
                     className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
                   >
                     {item.title}
                   </TransitionLink>
                 );
               }
+              return null;
             })
             )}
             </nav>
