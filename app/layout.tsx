@@ -30,7 +30,7 @@ export default async function RootLayout({
   const navigationItems = await getPrimaryNavigation('en');
 
   // Hide header/footer in production (landing page has its own)
-  const isProduction = true; // process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === 'production';
 
   return (
     <html lang="en">
