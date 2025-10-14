@@ -31,6 +31,8 @@ export const SAFELIST_CLASSES = [
   'text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl',
   'text-2xl', 'text-3xl', 'text-4xl', 'text-5xl', 'text-6xl',
   'text-7xl', 'text-8xl', 'text-9xl',
+  // Text alignment (WordPress alignment classes)
+  'text-left', 'text-center', 'text-right', 'text-justify',
 ];
 
 /**
@@ -57,6 +59,8 @@ export function SafelistComponent() {
       <div className="rounded-md rounded-lg rounded-xl" />
       {/* Text sizes */}
       <div className="text-xs text-sm text-base text-lg text-xl text-2xl text-3xl text-4xl text-5xl text-6xl text-7xl text-8xl text-9xl" />
+      {/* Text alignment */}
+      <div className="text-left text-center text-right text-justify" />
     </div>
   );
 }

@@ -279,6 +279,29 @@ export function processWPContent(html: string): string {
   processHeading('h5', headingClasses.h5);
   processHeading('h6', headingClasses.h6);
 
+  // Convert WordPress text alignment classes to Tailwind
+  // Pattern: has-text-align-{alignment} → text-{alignment}
+  processedHtml = processedHtml.replace(
+    /class=["']([^"']*)["']/gi,
+    (match, classes) => {
+      let updatedClasses = classes;
+
+      // Check for text alignment classes and convert them
+      const alignmentMatch = classes.match(/has-text-align-(left|center|right|justify)/);
+      if (alignmentMatch) {
+        const alignment = alignmentMatch[1];
+        // Remove the WordPress alignment class
+        updatedClasses = updatedClasses.replace(/has-text-align-(left|center|right|justify)/g, '').trim();
+        // Add the Tailwind alignment class
+        updatedClasses += ` text-${alignment}`;
+        // Clean up multiple spaces
+        updatedClasses = updatedClasses.replace(/\s+/g, ' ').trim();
+      }
+
+      return `class="${updatedClasses}"`;
+    }
+  );
+
   // Replace WordPress block group classes with Tailwind
   // wp-block-group with has-global-padding and is-layout-constrained
   processedHtml = processedHtml.replace(
