@@ -249,31 +249,34 @@ export function processWPContent(html: string): string {
     '$1$2'
   );
 
-  // Replace heading classes
-  processedHtml = processedHtml.replace(
-    /<h1\s+class=["']wp-block-heading["']/gi,
-    `<h1 class="${headingClasses.h1}"`
-  );
-  processedHtml = processedHtml.replace(
-    /<h2\s+class=["']wp-block-heading["']/gi,
-    `<h2 class="${headingClasses.h2}"`
-  );
-  processedHtml = processedHtml.replace(
-    /<h3\s+class=["']wp-block-heading["']/gi,
-    `<h3 class="${headingClasses.h3}"`
-  );
-  processedHtml = processedHtml.replace(
-    /<h4\s+class=["']wp-block-heading["']/gi,
-    `<h4 class="${headingClasses.h4}"`
-  );
-  processedHtml = processedHtml.replace(
-    /<h5\s+class=["']wp-block-heading["']/gi,
-    `<h5 class="${headingClasses.h5}"`
-  );
-  processedHtml = processedHtml.replace(
-    /<h6\s+class=["']wp-block-heading["']/gi,
-    `<h6 class="${headingClasses.h6}"`
-  );
+  // Replace heading classes - handles wp-block-heading with optional WordPress font size classes
+  // Converts has-text-{size}-font-size to text-{size}
+  const processHeading = (tag: string, defaultClasses: string) => {
+    const regex = new RegExp(`<${tag}\\s+class=["']([^"']*\\bwp-block-heading\\b[^"']*)["']`, 'gi');
+    processedHtml = processedHtml.replace(regex, (_match, classes) => {
+      let tailwindClasses = defaultClasses;
+
+      // Convert WordPress font size classes to Tailwind
+      // Pattern: has-text-{size}-font-size → text-{size}
+      const fontSizeMatch = classes.match(/has-text-([a-z0-9-]+)-font-size/i);
+      if (fontSizeMatch) {
+        const size = fontSizeMatch[1];
+        // Replace the default font size with the WordPress one
+        // Remove the default text-{size} class and add the new one
+        tailwindClasses = tailwindClasses.replace(/text-\w+/g, '').trim();
+        tailwindClasses += ` text-${size}`;
+      }
+
+      return `<${tag} class="${tailwindClasses}"`;
+    });
+  };
+
+  processHeading('h1', headingClasses.h1);
+  processHeading('h2', headingClasses.h2);
+  processHeading('h3', headingClasses.h3);
+  processHeading('h4', headingClasses.h4);
+  processHeading('h5', headingClasses.h5);
+  processHeading('h6', headingClasses.h6);
 
   // Replace WordPress block group classes with Tailwind
   // wp-block-group with has-global-padding and is-layout-constrained

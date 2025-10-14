@@ -27,6 +27,10 @@ export const SAFELIST_CLASSES = [
   'border', 'border-slate-200', 'dark:border-slate-800',
   // Border radius
   'rounded-md', 'rounded-lg', 'rounded-xl',
+  // Text sizes (WordPress font size classes)
+  'text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl',
+  'text-2xl', 'text-3xl', 'text-4xl', 'text-5xl', 'text-6xl',
+  'text-7xl', 'text-8xl', 'text-9xl',
 ];
 
 /**
@@ -51,6 +55,8 @@ export function SafelistComponent() {
       <div className="border border-slate-200 dark:border-slate-800" />
       {/* Border radius */}
       <div className="rounded-md rounded-lg rounded-xl" />
+      {/* Text sizes */}
+      <div className="text-xs text-sm text-base text-lg text-xl text-2xl text-3xl text-4xl text-5xl text-6xl text-7xl text-8xl text-9xl" />
     </div>
   );
 }
