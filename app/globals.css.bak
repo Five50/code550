@@ -650,8 +650,6 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Saira', 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
-  color: rgb(15 23 42);
-  /* slate-900 */
 }
 
 h1 {

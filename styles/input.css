@@ -1,6 +1,107 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Configure class-based dark mode for Tailwind v4 */
+@variant dark (.dark &);
+
+/* AltoFuel Brand Fonts */
+@font-face {
+  font-family: 'Saira';
+  src: url('/fonts/saira/Saira-VariableFont_wdth,wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Saira';
+  src: url('/fonts/saira/Saira-Italic-VariableFont_wdth,wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Fira Sans Font Family */
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  src: url('/fonts/fira-sans/FiraSans-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 
 /* WordPress Block Library Styles - Core WordPress Blocks */
 
@@ -227,24 +328,8 @@
   min-width: 250px;
 }
 
-/* Buttons */
-.wp-block-button {
-  margin-bottom: 1rem;
-}
-
-.wp-block-button__link {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #007cba;
-  color: white;
-  text-decoration: none;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s;
-}
-
-.wp-block-button__link:hover {
-  background-color: #005a87;
-}
+/* Buttons - Classes are replaced directly in HTML via processWPContent() */
+/* No CSS needed here as Tailwind classes are applied directly to elements */
 
 /* Lists */
 .wp-block-list {
@@ -270,107 +355,6 @@
 .wp-block-spacer {
   clear: both;
 }
-
-/* AltoFuel Brand Fonts */
-@font-face {
-  font-family: 'Saira';
-  src: url('/fonts/saira/Saira-VariableFont_wdth,wght.woff2') format('woff2-variations');
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Saira';
-  src: url('/fonts/saira/Saira-Italic-VariableFont_wdth,wght.woff2') format('woff2-variations');
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Fira Sans Font Family */
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-LightItalic.woff2') format('woff2');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-MediumItalic.woff2') format('woff2');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-SemiBoldItalic.woff2') format('woff2');
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  src: url('/fonts/fira-sans/FiraSans-BoldItalic.woff2') format('woff2');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
 
 @layer base {
   :root {
@@ -436,11 +420,11 @@
   }
 
   * {
-    @apply border-slate-200;
+    @apply border-slate-200 dark:border-slate-800;
   }
 
   body {
-    @apply bg-white text-slate-900;
+    @apply bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50;
     font-family: 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
   }
 
@@ -448,7 +432,7 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Saira', 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-    color: rgb(15 23 42); /* slate-900 */
+    @apply text-slate-900 dark:text-slate-50;
   }
 
   h1 {

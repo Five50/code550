@@ -12,6 +12,7 @@ import {
   getBlogPageContent
 } from '@/lib/wordpress';
 import { getLanguageFromPathname, normalizeLanguage, removeLanguagePrefix } from '@/lib/i18n';
+import { processWPContent } from '@/lib/process-wp-content';
 import { Section, Container, Article } from '@/components/craft';
 import { badgeVariants } from '@/components/ui/badge';
 import { StructuredData } from '@/components/seo/structured-data';
@@ -243,7 +244,7 @@ async function PostPage({ post }: { post: any }) {
               />
             </div>
           )}
-        <Article dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+        <Article dangerouslySetInnerHTML={{ __html: processWPContent(post.content.rendered) }} />
         </div>
       </Container>
     </Section>
@@ -265,7 +266,7 @@ function PageContent({ page }: { page: any }) {
             </Balancer>
           </h1>
 
-        <Article dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+        <Article dangerouslySetInnerHTML={{ __html: processWPContent(page.content.rendered) }} />
         </div>
       </Container>
     </Section>

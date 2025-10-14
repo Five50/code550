@@ -1,4 +1,5 @@
 import { getPageBySlug, getAllPages } from "@/lib/wordpress";
+import { processWPContent } from "@/lib/process-wp-content";
 import { Section, Container } from "@/components/craft";
 import { siteConfig } from "@/site.config";
 
@@ -77,7 +78,7 @@ export default async function Page({
       <Container>
         <div className="">
           <h2>{page.title.rendered}</h2>
-          <div dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+          <div dangerouslySetInnerHTML={{ __html: processWPContent(page.content.rendered) }} />
         </div>
       </Container>
     </Section>

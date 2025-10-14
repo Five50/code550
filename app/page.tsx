@@ -2,6 +2,7 @@ import {Section, Container, Article} from "@/components/craft";
 import {PostCard} from "@/components/posts/post-card";
 import {HeaderSettings} from "@/components/header-settings";
 import {getFrontPageContent, getPostsPaginated, isNoTitleTemplate} from "@/lib/wordpress";
+import {processWPContent} from "@/lib/process-wp-content";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import type {Metadata} from "next";
@@ -59,7 +60,7 @@ export default async function Home() {
                                     </h1>
                                 </div>
                             )}
-                            <Article dangerouslySetInnerHTML={{__html: frontPage.content.content.rendered}}/>
+                            <Article dangerouslySetInnerHTML={{__html: processWPContent(frontPage.content.content.rendered)}}/>
                         </Container>
                     </Section>
                 </>

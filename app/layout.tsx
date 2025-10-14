@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { HeaderProvider } from "@/lib/header-context";
+import { ThemeProvider } from "@/components/theme-provider";
 import { getPrimaryNavigation } from "@/lib/wordpress";
 import Script from "next/script";
 
@@ -33,23 +34,45 @@ export default async function RootLayout({
   const isProduction = process.env.NODE_ENV === 'production';
 
   return (
-    <html lang="en">
-      <head />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme') || 'dark';
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={cn(
         "min-h-screen font-sans antialiased",
         isProduction
           ? "bg-blue-950 text-slate-400"
           : "text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900"
       )}>
-        <HeaderProvider>
-          {!isProduction && <Header navigationItems={navigationItems} />}
-          {isProduction ? (
-            children
-          ) : (
-            <main style={{ viewTransitionName: 'main' }}>{children}</main>
-          )}
-          {!isProduction && <Footer />}
-        </HeaderProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <HeaderProvider>
+            {!isProduction && <Header navigationItems={navigationItems} />}
+            {isProduction ? (
+              children
+            ) : (
+              <main style={{ viewTransitionName: 'main' }}>{children}</main>
+            )}
+            {!isProduction && <Footer />}
+          </HeaderProvider>
+        </ThemeProvider>
         <Analytics />
 
         {/* Alpine.js */}

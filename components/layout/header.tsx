@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { TransitionLink } from "@/components/ui/transition-link";
 import { MegaMenu } from "@/components/nav/mega-menu";
 import { MegaMenuContainer } from "@/components/nav/mega-menu-container";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useHeader } from "@/lib/header-context";
 import { navigationMenu } from "@/menu.config";
 import { siteConfig } from "@/site.config";
@@ -193,6 +194,9 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 md:gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Call-to-Action Buttons */}
             <Button
               variant="ghost"
