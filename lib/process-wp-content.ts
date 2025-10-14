@@ -294,23 +294,37 @@ export function processWPContent(html: string): string {
     (match, groupAttrs, groupContent) => {
       // Process direct children - match opening tags of common block elements
       const processedContent = groupContent.replace(
-        /(<(?:h[1-6]|p|div|ul|ol|blockquote|figure)([^>]*class="[^"]*?)("[\s\S]*?>))/gi,
-        (childMatch: string, fullTag: string, beforeClose: string, afterClass: string) => {
+        /<(h[1-6]|p|div|ul|ol|blockquote|figure)([^>]*)>/gi,
+        (match, tagName, attributes) => {
           // Skip if already has alignment or width classes
           if (
-            beforeClose.includes('alignleft') ||
-            beforeClose.includes('alignright') ||
-            beforeClose.includes('alignfull') ||
-            beforeClose.includes('alignwide') ||
-            beforeClose.includes('max-w-') ||
-            beforeClose.includes('w-screen') ||
-            beforeClose.includes('wp-block-group') // Don't add to nested groups
+            attributes.includes('alignleft') ||
+            attributes.includes('alignright') ||
+            attributes.includes('alignfull') ||
+            attributes.includes('alignwide') ||
+            attributes.includes('max-w-') ||
+            attributes.includes('w-screen') ||
+            attributes.includes('wp-block-group')
           ) {
-            return childMatch;
+            return match;
           }
 
-          // Add constrained width to direct children
-          return `${beforeClose} max-w-[720px] mx-auto${afterClass}`;
+          // Add classes to existing class attribute, or create new class attribute
+          let updatedAttributes = attributes;
+          if (attributes.match(/class=/i)) {
+            // Has class attribute - add to it
+            updatedAttributes = attributes.replace(
+              /class=(["'])([^"']*)\1/i,
+              (classMatch, quote, classValue) => {
+                return `class=${quote}${classValue} max-w-[720px] mx-auto${quote}`;
+              }
+            );
+          } else {
+            // No class attribute - add one
+            updatedAttributes = ` class="max-w-[720px] mx-auto"${attributes}`;
+          }
+
+          return `<${tagName}${updatedAttributes}>`;
         }
       );
 
