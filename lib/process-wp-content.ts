@@ -102,8 +102,23 @@ export function processWPContent(html: string): string {
 
   // Replace button container classes first
   processedHtml = processedHtml.replace(
-    /class=["']wp-block-buttons[^"']*["']/gi,
-    'class="flex flex-wrap gap-3 my-6"'
+    /class=["']([^"']*\bwp-block-buttons\b[^"']*)["']/gi,
+    (_match, classes) => {
+      let tailwindClasses = 'flex flex-wrap gap-3 my-6';
+
+      // Handle justification classes
+      if (classes.includes('is-content-justification-center')) {
+        tailwindClasses += ' justify-center';
+      } else if (classes.includes('is-content-justification-right')) {
+        tailwindClasses += ' justify-end';
+      } else if (classes.includes('is-content-justification-left')) {
+        tailwindClasses += ' justify-start';
+      } else if (classes.includes('is-content-justification-space-between')) {
+        tailwindClasses += ' justify-between';
+      }
+
+      return `class="${tailwindClasses}"`;
+    }
   );
 
   // Process buttons with outline style (handles is-style-outline with any additional classes like is-style-outline--2)
@@ -143,6 +158,27 @@ export function processWPContent(html: string): string {
       }
       return match;
     }
+  );
+
+  // Replace WordPress columns container classes
+  processedHtml = processedHtml.replace(
+    /class=["']([^"']*\bwp-block-columns\b[^"']*)["']/gi,
+    (_match, classes) => {
+      let tailwindClasses = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+
+      // Handle alignwide for wider layouts
+      if (classes.includes('alignwide')) {
+        tailwindClasses += ' max-w-7xl mx-auto';
+      }
+
+      return `class="${tailwindClasses}"`;
+    }
+  );
+
+  // Replace WordPress column classes (individual columns)
+  processedHtml = processedHtml.replace(
+    /class=["']([^"']*\bwp-block-column\b(?!s)[^"']*)["']/gi,
+    'class="flex flex-col"'
   );
 
   // Replace WordPress cover block classes
@@ -258,7 +294,7 @@ export function processWPContent(html: string): string {
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
-        tailwindClasses.push('w-screen max-w-full -mx-4 md:-mx-8');
+        tailwindClasses.push('w-screen max-w-full');
       }
       // Default constrained layout (900px)
       else if (classes.includes('is-layout-constrained')) {
@@ -285,7 +321,7 @@ export function processWPContent(html: string): string {
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
-        tailwindClasses.push('w-screen max-w-full -mx-4 md:-mx-8');
+        tailwindClasses.push('w-screen max-w-full');
       }
       // Default constrained layout (900px)
       else if (classes.includes('is-layout-constrained')) {
@@ -385,6 +421,22 @@ export function processWPContent(html: string): string {
         tailwindClasses.push('my-0');
       }
 
+      // Convert border styles
+      // Detect border-style:solid and border-width:1px
+      if (styleContent.includes('border-style:solid') &&
+          (styleContent.includes('border-width:1px') || styleContent.includes('border-width: 1px'))) {
+        tailwindClasses.push('border', 'border-slate-200', 'dark:border-slate-800');
+      }
+
+      // Convert border-radius
+      if (styleContent.includes('border-radius:0.5em') || styleContent.includes('border-radius: 0.5em')) {
+        tailwindClasses.push('rounded-lg');
+      } else if (styleContent.includes('border-radius:1em') || styleContent.includes('border-radius: 1em')) {
+        tailwindClasses.push('rounded-xl');
+      } else if (styleContent.includes('border-radius:0.25em') || styleContent.includes('border-radius: 0.25em')) {
+        tailwindClasses.push('rounded-md');
+      }
+
       // Convert blockGap to gap- classes
       Object.entries(spacingMap).forEach(([wpVar, twValue]) => {
         // Match both blockGap and block-gap in CSS format
@@ -434,7 +486,7 @@ export function processWPContent(html: string): string {
   // Clean up any duplicate class attributes that may have been created
   processedHtml = processedHtml.replace(
     /class=["']([^"']*)["']\s+class=["']([^"']*)["']/gi,
-    (match, class1, class2) => {
+    (_match, class1, class2) => {
       // Merge the two class attributes
       const combinedClasses = `${class1} ${class2}`.split(' ').filter((c, i, arr) => arr.indexOf(c) === i).join(' ');
       return `class="${combinedClasses}"`;
@@ -451,7 +503,7 @@ export function processWPContent(html: string): string {
   processedHtml = processedHtml.replace(/class=["']\s*["']/gi, '');
 
   // Clean up extra whitespace in class attributes
-  processedHtml = processedHtml.replace(/class=["']([^"']+)["']/gi, (match, classes) => {
+  processedHtml = processedHtml.replace(/class=["']([^"']+)["']/gi, (_match, classes) => {
     const cleanedClasses = classes.trim().replace(/\s+/g, ' ');
     return cleanedClasses ? `class="${cleanedClasses}"` : '';
   });
