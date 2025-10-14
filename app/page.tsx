@@ -3,6 +3,7 @@ import {PostCard} from "@/components/posts/post-card";
 import {HeaderSettings} from "@/components/header-settings";
 import {getFrontPageContent, getPostsPaginated, isNoTitleTemplate} from "@/lib/wordpress";
 import {processWPContent} from "@/lib/process-wp-content";
+import {siteConfig} from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import type {Metadata} from "next";
@@ -31,10 +32,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-    // Show landing page in production temporarily
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Only show landing page on actual production domain, not on preview/dev deployments
+    const isProductionDomain = process.env.VERCEL_ENV === 'production' &&
+        process.env.VERCEL_URL === siteConfig.site_domain.replace('https://', '');
 
-    if (isProduction) {
+    if (isProductionDomain) {
         return <FallbackHomepage/>;
     }
 
