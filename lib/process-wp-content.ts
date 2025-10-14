@@ -292,8 +292,12 @@ export function processWPContent(html: string): string {
   processedHtml = processedHtml.replace(
     /<div([^>]*class=")([^"]*wp-block-group[^"]*)("[^>]*)>/gi,
     (match, beforeClass, classValue, afterClass) => {
+      // Check if content justification is set to left (which means don't center children)
+      const hasLeftJustification = classValue.includes('is-content-justification-left');
+
       // Add the child selector classes to the class attribute
-      return `<div${beforeClass}${classValue} *:max-w-3xl *:mx-auto${afterClass}>`;
+      const childClasses = hasLeftJustification ? '*:max-w-3xl' : '*:max-w-3xl *:mx-auto';
+      return `<div${beforeClass}${classValue} ${childClasses}${afterClass}>`;
     }
   );
 
@@ -336,9 +340,13 @@ export function processWPContent(html: string): string {
         tailwindClasses.push('px-6');
       }
 
+      // Check if content justification is set to left
+      const hasLeftJustification = classes.includes('is-content-justification-left');
+
       // Add alignwide support for wider content
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('!max-w-5xl mx-auto *:max-w-5xl *:mx-auto');
+        const childClasses = hasLeftJustification ? '*:max-w-5xl' : '*:max-w-5xl *:mx-auto';
+        tailwindClasses.push(`!max-w-5xl mx-auto ${childClasses}`);
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -346,7 +354,8 @@ export function processWPContent(html: string): string {
       }
       // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('*:max-w-3xl *:mx-auto');
+        const childClasses = hasLeftJustification ? '*:max-w-3xl' : '*:max-w-3xl *:mx-auto';
+        tailwindClasses.push(childClasses);
       }
 
       // Add back the constrained width classes if they existed
@@ -368,9 +377,13 @@ export function processWPContent(html: string): string {
         tailwindClasses.push('px-6');
       }
 
+      // Check if content justification is set to left
+      const hasLeftJustification = classes.includes('is-content-justification-left');
+
       // Add alignwide support for wider content
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('!max-w-5xl mx-auto *:max-w-5xl *:mx-auto');
+        const childClasses = hasLeftJustification ? '*:max-w-5xl' : '*:max-w-5xl *:mx-auto';
+        tailwindClasses.push(`!max-w-5xl mx-auto ${childClasses}`);
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -378,7 +391,8 @@ export function processWPContent(html: string): string {
       }
       // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('*:max-w-3xl *:mx-auto');
+        const childClasses = hasLeftJustification ? '*:max-w-3xl' : '*:max-w-3xl *:mx-auto';
+        tailwindClasses.push(childClasses);
       }
 
       // Add content-specific classes
