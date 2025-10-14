@@ -287,6 +287,34 @@ export function processWPContent(html: string): string {
   processHeading('h5', headingClasses.h5);
   processHeading('h6', headingClasses.h6);
 
+  // Apply constrained width to elements without explicit alignment
+  // This mimics WordPress's .is-layout-constrained behavior
+  // Matches common block elements (h1-h6, p, div, etc.) and adds max-width constraint
+  const applyConstrainedWidth = (html: string) => {
+    // Match elements that don't already have alignment classes
+    return html.replace(
+      /<(h[1-6]|p|div|ul|ol|blockquote)([^>]*class="[^"]*?)("[^>]*>)/gi,
+      (match, tag, beforeClose, afterClass) => {
+        // Check if already has alignment or width classes
+        if (
+          beforeClose.includes('alignleft') ||
+          beforeClose.includes('alignright') ||
+          beforeClose.includes('alignfull') ||
+          beforeClose.includes('alignwide') ||
+          beforeClose.includes('max-w-') ||
+          beforeClose.includes('w-screen')
+        ) {
+          return match;
+        }
+
+        // Add constrained width classes
+        return `<${tag}${beforeClose} max-w-[720px] mx-auto${afterClass}`;
+      }
+    );
+  };
+
+  processedHtml = applyConstrainedWidth(processedHtml);
+
   // Convert WordPress text alignment classes to Tailwind
   // Pattern: has-text-align-{alignment} → text-{alignment}
   processedHtml = processedHtml.replace(
