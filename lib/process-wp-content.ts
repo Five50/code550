@@ -337,11 +337,6 @@ export function processWPContent(html: string): string {
       // Base classes for block groups - default flex column layout with gap
       let tailwindClasses = ['flex', 'flex-col', 'gap-4'];
 
-      // Check for specific WordPress classes and map to Tailwind
-      if (classes.includes('has-global-padding')) {
-        tailwindClasses.push('px-6');
-      }
-
       // Check if content justification is set to left
       const hasLeftJustification = classes.includes('is-content-justification-left');
 
