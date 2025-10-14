@@ -32,27 +32,27 @@ export function processWPContent(html: string): string {
     'class="flex flex-wrap gap-3 my-6"'
   );
 
-  // Process buttons with outline style
+  // Process buttons with outline style (handles is-style-outline with any additional classes like is-style-outline--2)
   processedHtml = processedHtml.replace(
-    /<div\s+class=["']wp-block-button\s+is-style-outline["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
+    /<div\s+class=["']([^"']*\bwp-block-button\b[^"']*\bis-style-outline\b[^"']*)["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
     `<div class="inline-flex"><a class="${buttonBaseClasses} ${buttonVariants.outline}"`
   );
 
   // Process buttons with secondary style
   processedHtml = processedHtml.replace(
-    /<div\s+class=["']wp-block-button\s+is-style-secondary["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
+    /<div\s+class=["']([^"']*\bwp-block-button\b[^"']*\bis-style-secondary\b[^"']*)["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
     `<div class="inline-flex"><a class="${buttonBaseClasses} ${buttonVariants.secondary}"`
   );
 
   // Process buttons with ghost style
   processedHtml = processedHtml.replace(
-    /<div\s+class=["']wp-block-button\s+is-style-ghost["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
+    /<div\s+class=["']([^"']*\bwp-block-button\b[^"']*\bis-style-ghost\b[^"']*)["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
     `<div class="inline-flex"><a class="${buttonBaseClasses} ${buttonVariants.ghost}"`
   );
 
   // Process default buttons (no style class) - must be last
   processedHtml = processedHtml.replace(
-    /<div\s+class=["']wp-block-button["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
+    /<div\s+class=["']wp-block-button(?!\s+is-style-)["']>\s*<a\s+class=["']wp-block-button__link\s+wp-element-button["']/gi,
     `<div class="inline-flex"><a class="${buttonBaseClasses} ${buttonVariants.default}"`
   );
 
