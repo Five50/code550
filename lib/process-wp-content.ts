@@ -400,7 +400,7 @@ export function processWPContent(html: string): string {
         '--wp--preset--spacing--24': '24', // 6rem
       };
 
-      // Convert padding
+      // Convert padding from WordPress spacing variables
       Object.entries(spacingMap).forEach(([wpVar, twValue]) => {
         if (styleContent.includes(`padding-top:var(${wpVar})`)) {
           tailwindClasses.push(`pt-${twValue}`);
@@ -415,6 +415,32 @@ export function processWPContent(html: string): string {
           tailwindClasses.push(`pr-${twValue}`);
         }
       });
+
+      // Convert direct CSS padding values to Tailwind arbitrary values
+      // Match padding-top:6dvh, padding-top: 6dvh, etc.
+      const paddingTopMatch = styleContent.match(/padding-top:\s*([^;]+)/i);
+      if (paddingTopMatch && !paddingTopMatch[1].includes('var(')) {
+        const value = paddingTopMatch[1].trim();
+        tailwindClasses.push(`pt-[${value}]`);
+      }
+
+      const paddingBottomMatch = styleContent.match(/padding-bottom:\s*([^;]+)/i);
+      if (paddingBottomMatch && !paddingBottomMatch[1].includes('var(')) {
+        const value = paddingBottomMatch[1].trim();
+        tailwindClasses.push(`pb-[${value}]`);
+      }
+
+      const paddingLeftMatch = styleContent.match(/padding-left:\s*([^;]+)/i);
+      if (paddingLeftMatch && !paddingLeftMatch[1].includes('var(')) {
+        const value = paddingLeftMatch[1].trim();
+        tailwindClasses.push(`pl-[${value}]`);
+      }
+
+      const paddingRightMatch = styleContent.match(/padding-right:\s*([^;]+)/i);
+      if (paddingRightMatch && !paddingRightMatch[1].includes('var(')) {
+        const value = paddingRightMatch[1].trim();
+        tailwindClasses.push(`pr-[${value}]`);
+      }
 
       // Convert margin
       if (styleContent.includes('margin-top:0') && styleContent.includes('margin-bottom:0')) {
