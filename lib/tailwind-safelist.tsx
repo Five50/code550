@@ -36,9 +36,9 @@ export const SAFELIST_CLASSES = [
   // Text alignment (WordPress alignment classes)
   'text-left', 'text-center', 'text-right', 'text-justify',
   // Constrained width for wp-block-group children (direct child variants)
-  '*:max-w-3xl', '*:max-w-7xl', '*:mx-auto',
+  '*:max-w-3xl', '*:max-w-5xl', '*:mx-auto',
   // Important max-width for alignwide override
-  '!max-w-7xl',
+  '!max-w-5xl',
 ];
 
 /**
@@ -70,9 +70,9 @@ export function SafelistComponent() {
       {/* Text alignment */}
       <div className="text-left text-center text-right text-justify" />
       {/* Constrained width for wp-block-group children */}
-      <div className="*:max-w-3xl *:max-w-7xl *:mx-auto" />
+      <div className="*:max-w-3xl *:max-w-5xl *:mx-auto" />
       {/* Important max-width for alignwide override */}
-      <div className="!max-w-7xl" />
+      <div className="!max-w-5xl" />
     </div>
   );
 }

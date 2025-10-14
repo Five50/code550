@@ -168,7 +168,7 @@ export function processWPContent(html: string): string {
 
       // Handle alignwide for wider layouts - use !important to override parent constraints
       if (classes.includes('alignwide')) {
-        tailwindClasses += ' !max-w-7xl mx-auto';
+        tailwindClasses += ' !max-w-5xl mx-auto';
       }
 
       return `class="${tailwindClasses}"`;
@@ -329,16 +329,16 @@ export function processWPContent(html: string): string {
       let tailwindClasses = ['flex', 'flex-col', 'gap-4'];
 
       // Preserve constrained width classes if they exist
-      const constrainedWidthMatch = classes.match(/(?:\[&>?\*\]|\*):max-w-(?:\[720px\]|3xl|\[768px\]|7xl|\[1280px\])|(?:\[&>?\*\]|\*):mx-auto/g);
+      const constrainedWidthMatch = classes.match(/(?:\[&>?\*\]|\*):max-w-(?:\[720px\]|3xl|\[768px\]|5xl|\[1024px\])|(?:\[&>?\*\]|\*):mx-auto/g);
 
       // Check for specific WordPress classes and map to Tailwind
       if (classes.includes('has-global-padding')) {
         tailwindClasses.push('px-6');
       }
 
-      // Add alignwide support for wider content (1280px)
+      // Add alignwide support for wider content
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('!max-w-7xl mx-auto *:max-w-7xl *:mx-auto');
+        tailwindClasses.push('!max-w-5xl mx-auto *:max-w-5xl *:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -368,9 +368,9 @@ export function processWPContent(html: string): string {
         tailwindClasses.push('px-6');
       }
 
-      // Add alignwide support for wider content (1280px)
+      // Add alignwide support for wider content
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('!max-w-7xl mx-auto *:max-w-7xl *:mx-auto');
+        tailwindClasses.push('!max-w-5xl mx-auto *:max-w-5xl *:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
