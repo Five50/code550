@@ -287,33 +287,36 @@ export function processWPContent(html: string): string {
   processHeading('h5', headingClasses.h5);
   processHeading('h6', headingClasses.h6);
 
-  // Apply constrained width to elements without explicit alignment
-  // This mimics WordPress's .is-layout-constrained behavior
-  // Matches common block elements (h1-h6, p, div, etc.) and adds max-width constraint
-  const applyConstrainedWidth = (html: string) => {
-    // Match elements that don't already have alignment classes
-    return html.replace(
-      /<(h[1-6]|p|div|ul|ol|blockquote)([^>]*class="[^"]*?)("[^>]*>)/gi,
-      (match, tag, beforeClose, afterClass) => {
-        // Check if already has alignment or width classes
-        if (
-          beforeClose.includes('alignleft') ||
-          beforeClose.includes('alignright') ||
-          beforeClose.includes('alignfull') ||
-          beforeClose.includes('alignwide') ||
-          beforeClose.includes('max-w-') ||
-          beforeClose.includes('w-screen')
-        ) {
-          return match;
+  // Apply constrained width to direct children of wp-block-group
+  // This mimics WordPress's .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) behavior
+  processedHtml = processedHtml.replace(
+    /<div([^>]*class="[^"]*wp-block-group[^"]*"[^>]*)>([\s\S]*?)<\/div>/gi,
+    (match, groupAttrs, groupContent) => {
+      // Process direct children - match opening tags of common block elements
+      const processedContent = groupContent.replace(
+        /(<(?:h[1-6]|p|div|ul|ol|blockquote|figure)([^>]*class="[^"]*?)("[\s\S]*?>))/gi,
+        (childMatch: string, fullTag: string, beforeClose: string, afterClass: string) => {
+          // Skip if already has alignment or width classes
+          if (
+            beforeClose.includes('alignleft') ||
+            beforeClose.includes('alignright') ||
+            beforeClose.includes('alignfull') ||
+            beforeClose.includes('alignwide') ||
+            beforeClose.includes('max-w-') ||
+            beforeClose.includes('w-screen') ||
+            beforeClose.includes('wp-block-group') // Don't add to nested groups
+          ) {
+            return childMatch;
+          }
+
+          // Add constrained width to direct children
+          return `${beforeClose} max-w-[720px] mx-auto${afterClass}`;
         }
+      );
 
-        // Add constrained width classes
-        return `<${tag}${beforeClose} max-w-[720px] mx-auto${afterClass}`;
-      }
-    );
-  };
-
-  processedHtml = applyConstrainedWidth(processedHtml);
+      return `<div${groupAttrs}>${processedContent}</div>`;
+    }
+  );
 
   // Convert WordPress text alignment classes to Tailwind
   // Pattern: has-text-align-{alignment} → text-{alignment}

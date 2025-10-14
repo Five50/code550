@@ -33,7 +33,7 @@ export const SAFELIST_CLASSES = [
   'text-7xl', 'text-8xl', 'text-9xl',
   // Text alignment (WordPress alignment classes)
   'text-left', 'text-center', 'text-right', 'text-justify',
-  // Constrained width (WordPress content-size)
+  // Constrained width (WordPress .is-layout-constrained children)
   'max-w-[720px]', 'mx-auto',
 ];
 
