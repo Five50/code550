@@ -400,51 +400,33 @@ export function processWPContent(html: string): string {
         '--wp--preset--spacing--24': '24', // 6rem
       };
 
+      // Track which style properties we've converted
+      let convertedStyles: string[] = [];
+
       // Convert padding from WordPress spacing variables
       Object.entries(spacingMap).forEach(([wpVar, twValue]) => {
         if (styleContent.includes(`padding-top:var(${wpVar})`)) {
           tailwindClasses.push(`pt-${twValue}`);
+          convertedStyles.push('padding-top');
         }
         if (styleContent.includes(`padding-bottom:var(${wpVar})`)) {
           tailwindClasses.push(`pb-${twValue}`);
+          convertedStyles.push('padding-bottom');
         }
         if (styleContent.includes(`padding-left:var(${wpVar})`)) {
           tailwindClasses.push(`pl-${twValue}`);
+          convertedStyles.push('padding-left');
         }
         if (styleContent.includes(`padding-right:var(${wpVar})`)) {
           tailwindClasses.push(`pr-${twValue}`);
+          convertedStyles.push('padding-right');
         }
       });
-
-      // Convert direct CSS padding values to Tailwind arbitrary values
-      // Match padding-top:6dvh, padding-top: 6dvh, etc.
-      const paddingTopMatch = styleContent.match(/padding-top:\s*([^;]+)/i);
-      if (paddingTopMatch && !paddingTopMatch[1].includes('var(')) {
-        const value = paddingTopMatch[1].trim();
-        tailwindClasses.push(`pt-[${value}]`);
-      }
-
-      const paddingBottomMatch = styleContent.match(/padding-bottom:\s*([^;]+)/i);
-      if (paddingBottomMatch && !paddingBottomMatch[1].includes('var(')) {
-        const value = paddingBottomMatch[1].trim();
-        tailwindClasses.push(`pb-[${value}]`);
-      }
-
-      const paddingLeftMatch = styleContent.match(/padding-left:\s*([^;]+)/i);
-      if (paddingLeftMatch && !paddingLeftMatch[1].includes('var(')) {
-        const value = paddingLeftMatch[1].trim();
-        tailwindClasses.push(`pl-[${value}]`);
-      }
-
-      const paddingRightMatch = styleContent.match(/padding-right:\s*([^;]+)/i);
-      if (paddingRightMatch && !paddingRightMatch[1].includes('var(')) {
-        const value = paddingRightMatch[1].trim();
-        tailwindClasses.push(`pr-[${value}]`);
-      }
 
       // Convert margin
       if (styleContent.includes('margin-top:0') && styleContent.includes('margin-bottom:0')) {
         tailwindClasses.push('my-0');
+        convertedStyles.push('margin-top', 'margin-bottom');
       }
 
       // Convert border styles
@@ -452,15 +434,19 @@ export function processWPContent(html: string): string {
       if (styleContent.includes('border-style:solid') &&
           (styleContent.includes('border-width:1px') || styleContent.includes('border-width: 1px'))) {
         tailwindClasses.push('border', 'border-slate-200', 'dark:border-slate-800');
+        convertedStyles.push('border-style', 'border-width');
       }
 
       // Convert border-radius
       if (styleContent.includes('border-radius:0.5em') || styleContent.includes('border-radius: 0.5em')) {
         tailwindClasses.push('rounded-lg');
+        convertedStyles.push('border-radius');
       } else if (styleContent.includes('border-radius:1em') || styleContent.includes('border-radius: 1em')) {
         tailwindClasses.push('rounded-xl');
+        convertedStyles.push('border-radius');
       } else if (styleContent.includes('border-radius:0.25em') || styleContent.includes('border-radius: 0.25em')) {
         tailwindClasses.push('rounded-md');
+        convertedStyles.push('border-radius');
       }
 
       // Convert blockGap to gap- classes
@@ -468,6 +454,7 @@ export function processWPContent(html: string): string {
         // Match both blockGap and block-gap in CSS format
         if (styleContent.includes(`blockGap:var(${wpVar})`) || styleContent.includes(`block-gap:var(${wpVar})`)) {
           tailwindClasses.push(`gap-${twValue}`);
+          convertedStyles.push('blockGap', 'block-gap');
         }
       });
 
@@ -488,21 +475,43 @@ export function processWPContent(html: string): string {
         };
         if (gapMap[gapValue]) {
           tailwindClasses.push(`gap-${gapMap[gapValue]}`);
+          convertedStyles.push('blockGap');
         }
       }
 
-      // If we extracted classes, return a class attribute instead of style
-      // BUT preserve view-transition-name if it exists
-      if (tailwindClasses.length > 0) {
-        const hasViewTransition = styleContent.includes('view-transition-name');
-        if (hasViewTransition) {
-          // Extract view-transition-name value
-          const viewTransitionMatch = styleContent.match(/view-transition-name:\s*([^;]+)/i);
-          if (viewTransitionMatch) {
-            return `class="${tailwindClasses.join(' ')}" style="view-transition-name: ${viewTransitionMatch[1].trim()}"`;
-          }
+      // Build remaining style string with unconverted properties
+      let remainingStyles: string[] = [];
+
+      // Split styleContent into individual style declarations
+      const styleDeclarations = styleContent.split(';').filter((s: string) => s.trim());
+
+      for (const declaration of styleDeclarations) {
+        const [property] = declaration.split(':').map((s: string) => s.trim());
+
+        // Check if this property was NOT converted
+        const isConverted = convertedStyles.some(convertedProp =>
+          property.includes(convertedProp) || convertedProp.includes(property)
+        );
+
+        if (!isConverted && property && declaration.includes(':')) {
+          remainingStyles.push(declaration.trim());
         }
-        return `class="${tailwindClasses.join(' ')}"`;
+      }
+
+      // Build the return string
+      if (tailwindClasses.length > 0 || remainingStyles.length > 0) {
+        let result = '';
+
+        if (tailwindClasses.length > 0) {
+          result += `class="${tailwindClasses.join(' ')}"`;
+        }
+
+        if (remainingStyles.length > 0) {
+          const styleAttr = remainingStyles.join('; ');
+          result += (result ? ' ' : '') + `style="${styleAttr}"`;
+        }
+
+        return result || match;
       }
 
       return match;
