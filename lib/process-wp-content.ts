@@ -293,7 +293,7 @@ export function processWPContent(html: string): string {
     /<div([^>]*class=")([^"]*wp-block-group[^"]*)("[^>]*)>/gi,
     (match, beforeClass, classValue, afterClass) => {
       // Add the child selector classes to the class attribute
-      return `<div${beforeClass}${classValue} [&>*]:max-w-[720px] [&>*]:mx-auto${afterClass}>`;
+      return `<div${beforeClass}${classValue} [&>*]:max-w-3xl [&>*]:mx-auto${afterClass}>`;
     }
   );
 
@@ -329,7 +329,7 @@ export function processWPContent(html: string): string {
       let tailwindClasses = [];
 
       // Preserve constrained width classes if they exist
-      const constrainedWidthMatch = classes.match(/\[&>?\*\]:max-w-\[720px\]|\[&>?\*\]:mx-auto/g);
+      const constrainedWidthMatch = classes.match(/\[&>?\*\]:max-w-(?:\[720px\]|3xl|\[768px\]|7xl|\[1280px\])|\[&>?\*\]:mx-auto/g);
 
       // Check for specific WordPress classes and map to Tailwind
       if (classes.includes('has-global-padding')) {
@@ -338,7 +338,7 @@ export function processWPContent(html: string): string {
 
       // Add alignwide support for wider content (1280px)
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('max-w-[1280px] mx-auto');
+        tailwindClasses.push('[&>*]:max-w-7xl [&>*]:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -346,7 +346,7 @@ export function processWPContent(html: string): string {
       }
       // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('[&>*]:max-w-[720px] [&>*]:mx-auto');
+        tailwindClasses.push('[&>*]:max-w-3xl [&>*]:mx-auto');
       }
 
       // Add back the constrained width classes if they existed
@@ -370,7 +370,7 @@ export function processWPContent(html: string): string {
 
       // Add alignwide support for wider content (1280px)
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('max-w-[1280px] mx-auto');
+        tailwindClasses.push('[&>*]:max-w-7xl [&>*]:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -378,7 +378,7 @@ export function processWPContent(html: string): string {
       }
       // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('[&>*]:max-w-[720px] [&>*]:mx-auto');
+        tailwindClasses.push('[&>*]:max-w-3xl [&>*]:mx-auto');
       }
 
       // Add content-specific classes
