@@ -30,8 +30,9 @@ export default async function RootLayout({
   // Fetch navigation menu from WordPress
   const navigationItems = await getPrimaryNavigation('en');
 
-  // Hide header/footer in production (landing page has its own)
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Only show landing page on actual production domain, not on preview/dev deployments
+  const isProductionDomain = process.env.VERCEL_ENV === 'production' &&
+    process.env.VERCEL_URL === siteConfig.site_domain.replace('https://', '');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -53,7 +54,7 @@ export default async function RootLayout({
       </head>
       <body className={cn(
         "min-h-screen font-sans antialiased",
-        isProduction
+        isProductionDomain
           ? "bg-blue-950 text-slate-400"
           : "text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900"
       )}>
@@ -64,13 +65,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <HeaderProvider>
-            {!isProduction && <Header navigationItems={navigationItems} />}
-            {isProduction ? (
+            {!isProductionDomain && <Header navigationItems={navigationItems} />}
+            {isProductionDomain ? (
               children
             ) : (
               <main style={{ viewTransitionName: 'main' }}>{children}</main>
             )}
-            {!isProduction && <Footer />}
+            {!isProductionDomain && <Footer />}
           </HeaderProvider>
         </ThemeProvider>
         <Analytics />
