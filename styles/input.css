@@ -268,6 +268,13 @@
   margin-right: auto;
 }
 
+/* WordPress constrained layout - child elements */
+.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+  max-width: var(--wp--style--global--content-size, 900px);
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 /* WordPress Color Classes - Common theme colors */
 .has-contrast-background-color {
   background-color: #000000;
