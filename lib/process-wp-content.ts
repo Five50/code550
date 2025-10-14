@@ -260,10 +260,11 @@ export function processWPContent(html: string): string {
       // Pattern: has-text-{size}-font-size → text-{size}
       const fontSizeMatch = classes.match(/has-text-([a-z0-9-]+)-font-size/i);
       if (fontSizeMatch) {
-        const size = fontSizeMatch[1];
+        // Normalize size: WordPress might use "2-xl" but Tailwind uses "2xl"
+        const size = fontSizeMatch[1].replace(/(\d)-([a-z])/gi, '$1$2');
         // Replace the default font size with the WordPress one
-        // Remove the default text-{size} class and add the new one
-        tailwindClasses = tailwindClasses.replace(/text-\w+/g, '').trim();
+        // Only remove font size classes (text-xs, text-sm, etc.), not color classes (text-slate-900)
+        tailwindClasses = tailwindClasses.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/g, '').trim();
         tailwindClasses += ` text-${size}`;
       }
 
