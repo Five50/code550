@@ -290,10 +290,10 @@ export function processWPContent(html: string): string {
   // Apply constrained width to wp-block-group children using Tailwind arbitrary variants
   // This mimics WordPress's .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) behavior
   processedHtml = processedHtml.replace(
-    /<div([^>]*class="[^"]*wp-block-group[^"]*")([^>]*)>/gi,
-    (match, beforeClose, afterClass) => {
-      // Add the child selector classes inside the class attribute
-      return `<div${beforeClose} [&>*]:max-w-[720px] [&>*]:mx-auto"${afterClass}>`;
+    /<div([^>]*class=")([^"]*wp-block-group[^"]*)("[^>]*)>/gi,
+    (match, beforeClass, classValue, afterClass) => {
+      // Add the child selector classes to the class attribute
+      return `<div${beforeClass}${classValue} [&>*]:max-w-[720px] [&>*]:mx-auto${afterClass}>`;
     }
   );
 
