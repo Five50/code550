@@ -248,6 +248,32 @@ export interface TemplatePart {
   area: string;
 }
 
+export interface WordPressTemplate {
+  id: string;
+  slug: string;
+  theme: string;
+  type: string;
+  source: string;
+  origin: string | null;
+  content: {
+    raw: string;
+    rendered?: string;
+  };
+  title: {
+    raw: string;
+    rendered: string;
+  };
+  description: string;
+  status: "publish" | "future" | "draft" | "pending" | "private";
+  wp_id: number;
+  has_theme_file: boolean;
+  is_custom: boolean;
+  author: number;
+  modified: boolean;
+  author_text: string;
+  original_source: string;
+}
+
 export interface SearchResult {
   id: number;
   title: string;

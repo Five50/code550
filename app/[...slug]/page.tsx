@@ -13,7 +13,7 @@ import {
 } from '@/lib/wordpress';
 import { getLanguageFromPathname, normalizeLanguage, removeLanguagePrefix } from '@/lib/i18n';
 import { processWPContent } from '@/lib/process-wp-content';
-import { Section, Container, Article } from '@/components/craft';
+import { Section, Article } from '@/components/craft';
 import { badgeVariants } from '@/components/ui/badge';
 import { StructuredData } from '@/components/seo/structured-data';
 import { cn } from '@/lib/utils';
@@ -204,7 +204,6 @@ async function PostPage({ post }: { post: any }) {
     <>
       {post.seo?.schema && <StructuredData schema={post.seo.schema} />}
       <Section>
-        <Container>
         <div className="view-transition-content">
           <h1>
             <Balancer>
@@ -246,8 +245,7 @@ async function PostPage({ post }: { post: any }) {
           )}
         <Article dangerouslySetInnerHTML={{ __html: processWPContent(post.content.rendered) }} />
         </div>
-      </Container>
-    </Section>
+      </Section>
     </>
   );
 }
@@ -258,7 +256,6 @@ function PageContent({ page }: { page: any }) {
     <>
       {page.seo?.schema && <StructuredData schema={page.seo.schema} />}
       <Section>
-        <Container>
         <div className="view-transition-content">
           <h1>
             <Balancer>
@@ -268,8 +265,7 @@ function PageContent({ page }: { page: any }) {
 
         <Article dangerouslySetInnerHTML={{ __html: processWPContent(page.content.rendered) }} />
         </div>
-      </Container>
-    </Section>
+      </Section>
     </>
   );
 }

@@ -15,6 +15,7 @@ import type {
   Menu,
   MenuItem,
   MenuLocation,
+  WordPressTemplate,
 } from "./wordpress.d";
 
 const baseUrl = process.env.WORDPRESS_URL;
@@ -1146,6 +1147,50 @@ export async function getFooterNavigation(language?: string): Promise<MenuItem[]
   } catch (error) {
     console.warn('Error fetching footer navigation:', error);
     return [];
+  }
+}
+
+// WordPress Template Functions
+export async function getAllTemplates(): Promise<WordPressTemplate[]> {
+  try {
+    return await wordpressFetch<WordPressTemplate[]>(
+      "/wp-json/wp/v2/templates",
+      { per_page: 100 },
+      undefined,
+      true
+    );
+  } catch (error) {
+    console.warn("Templates not available:", error);
+    return [];
+  }
+}
+
+export async function getTemplateBySlug(slug: string): Promise<WordPressTemplate | null> {
+  try {
+    const templates = await wordpressFetch<WordPressTemplate[]>(
+      "/wp-json/wp/v2/templates",
+      { slug, per_page: 1 },
+      undefined,
+      true
+    );
+    return templates && templates.length > 0 ? templates[0] : null;
+  } catch (error) {
+    console.warn(`Template "${slug}" not found:`, error);
+    return null;
+  }
+}
+
+export async function getTemplateById(id: string): Promise<WordPressTemplate | null> {
+  try {
+    return await wordpressFetch<WordPressTemplate>(
+      `/wp-json/wp/v2/templates/${encodeURIComponent(id)}`,
+      {},
+      undefined,
+      true
+    );
+  } catch (error) {
+    console.warn(`Template with ID "${id}" not found:`, error);
+    return null;
   }
 }
 

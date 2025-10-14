@@ -6,7 +6,7 @@ import {
   getAllAuthors,
 } from "@/lib/wordpress";
 
-import { Section, Container } from "@/components/craft";
+import { Section } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
 import { FilterPosts } from "@/components/posts/filter";
 import { SearchInput } from "@/components/posts/search-input";
@@ -54,7 +54,7 @@ export default async function PostsArchivePage({ searchParams }: PostsArchivePag
 
   return (
     <Section>
-      <Container>
+      
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
             <h1 className="text-4xl font-bold">
@@ -122,7 +122,7 @@ export default async function PostsArchivePage({ searchParams }: PostsArchivePag
             </div>
           )}
         </div>
-      </Container>
+      
     </Section>
   );
 }

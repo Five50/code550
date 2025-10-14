@@ -1,4 +1,4 @@
-import {Section, Container} from "@/components/craft";
+import {Section} from "@/components/craft";
 import {TransitionLink} from "@/components/ui/transition-link";
 import {LanguageSwitcher} from "@/components/language-switcher";
 import {mainMenu, contentMenu, navigationMenu} from "@/menu.config";
@@ -83,9 +83,8 @@ export function Footer({className}: FooterProps) {
     return (
         <footer className={className} role="contentinfo">
             {/* Main Footer */}
-            <Section className="relative text-slate-300 px-4 sm:px-6 lg:px-8 border border-blue-600/20">
-                <Container className="relative">
-                    <div className="py-16 lg:py-20">
+            <Section className="relative text-zinc-300 px-4 sm:px-6 lg:px-8 border border-blue-600/20">
+                <div className="py-16 lg:py-20">
                         {/* Main Footer Content */}
                         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
                             {/* Company Informat ion */}
@@ -94,7 +93,7 @@ export function Footer({className}: FooterProps) {
 
                                     {/* Description */}
                                     <div className="space-y-6">
-                                        <p className="text-lg text-slate-300 leading-relaxed max-w-md">
+                                        <p className="text-lg text-zinc-300 leading-relaxed max-w-md">
                                             <Balancer>
                                                 Enterprise fuel trading platform with real-time risk management,
                                                 advanced analytics, and regulatory compliance.
@@ -118,7 +117,7 @@ export function Footer({className}: FooterProps) {
                                                         <li key={item.href}>
                                                             <TransitionLink
                                                                 href={item.href}
-                                                                className="text-sm text-slate-400 hover:text-white transition-colors duration-200 hover:translate-x-0.5 inline-block"
+                                                                className="text-sm text-zinc-400 hover:text-white transition-colors duration-200 hover:tranzinc-x-0.5 inline-block"
                                                             >
                                                                 {item.name}
                                                             </TransitionLink>
@@ -132,25 +131,23 @@ export function Footer({className}: FooterProps) {
                             </div>
                         </div>
                     </div>
-                </Container>
             </Section>
 
             {/* Bottom Bar */}
             <Section className="border-t border-blue-800/25">
-                <Container>
-                    <div className="py-6">
+                <div className="py-6">
                         <div className="flex flex-col lg:flex-row gap-6 justify-between lg:items-center">
                             {/* Copyright and Legal */}
-                            <div className="flex flex-col sm:flex-row gap-6 text-sm text-slate-400">
+                            <div className="flex flex-col sm:flex-row gap-6 text-sm text-zinc-400">
                                 <p className="flex items-center gap-2">
                                     &copy; {currentYear}
                                     <TransitionLink
                                         href="/"
-                                        className="font-medium text-slate-300 hover:text-white transition-colors"
+                                        className="font-medium text-zinc-300 hover:text-white transition-colors"
                                     >
                                         {siteConfig.site_name}
                                     </TransitionLink>
-                                    <span className="text-slate-600">•</span>
+                                    <span className="text-zinc-600">•</span>
                                     <span>All rights reserved</span>
                                 </p>
                             </div>
@@ -164,7 +161,6 @@ export function Footer({className}: FooterProps) {
                             </div>
                         </div>
                     </div>
-                </Container>
             </Section>
         </footer>
     );

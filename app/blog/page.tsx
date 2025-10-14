@@ -8,7 +8,7 @@ import {
 } from "@/lib/wordpress";
 import { processWPContent } from "@/lib/process-wp-content";
 
-import { Section, Container, Article } from "@/components/craft";
+import { Section, Article } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
 import { FilterPosts } from "@/components/posts/filter";
 import { SearchInput } from "@/components/posts/search-input";
@@ -78,8 +78,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
     return (
       <Section>
-        <Container>
-          <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
             {/* Page Header - matches WordPress template hierarchy */}
             <div className="flex flex-col gap-4">
               {blogPage.page ? (
@@ -174,8 +173,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 )}
               </div>
             )}
-          </div>
-        </Container>
+        </div>
       </Section>
     );
   } catch (error) {
@@ -183,8 +181,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
     return (
       <Section>
-        <Container>
-          <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-4xl font-bold">
                 <Balancer>Blog</Balancer>
@@ -198,8 +195,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 Unable to load blog posts. Please check your WordPress connection.
               </p>
             </div>
-          </div>
-        </Container>
+        </div>
       </Section>
     );
   }

@@ -17,7 +17,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import { Section, Container } from "@/components/craft";
+import { Section } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
 import { FilterPosts } from "@/components/posts/filter";
 import { SearchInput } from "@/components/posts/search-input";
@@ -74,7 +74,7 @@ export default async function Page({
 
   return (
     <Section>
-      <Container>
+      
         <div className="space-y-8">
           <div className="">
             <h2>All Posts</h2>
@@ -158,7 +158,7 @@ export default async function Page({
             </div>
           )}
         </div>
-      </Container>
+      
     </Section>
   );
 }

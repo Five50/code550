@@ -8,7 +8,7 @@ import {
 } from "@/lib/wordpress";
 import { processWPContent } from "@/lib/process-wp-content";
 
-import { Section, Container, Article } from "@/components/craft";
+import { Section, Article } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
 import { FilterPosts } from "@/components/posts/filter";
 import { SearchInput } from "@/components/posts/search-input";
@@ -88,7 +88,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
 
     return (
       <Section>
-        <Container>
+        
           <div className="flex flex-col gap-6">
             {/* Page Header - matches WordPress template hierarchy */}
             <div className="flex flex-col gap-4">
@@ -185,7 +185,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
               </div>
             )}
           </div>
-        </Container>
+        
       </Section>
     );
   } catch (error) {
@@ -193,7 +193,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
 
     return (
       <Section>
-        <Container>
+        
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-4xl font-bold">
@@ -209,7 +209,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
               </p>
             </div>
           </div>
-        </Container>
+        
       </Section>
     );
   }

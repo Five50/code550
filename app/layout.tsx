@@ -66,11 +66,7 @@ export default async function RootLayout({
         >
           <HeaderProvider>
             {!isProductionDomain && <Header navigationItems={navigationItems} />}
-            {isProductionDomain ? (
-              children
-            ) : (
-              <main style={{ viewTransitionName: 'main' }}>{children}</main>
-            )}
+            {children}
             {!isProductionDomain && <Footer />}
           </HeaderProvider>
         </ThemeProvider>

@@ -1,7 +1,9 @@
-import { getPageBySlug, getAllPages, isNoTitleTemplate } from "@/lib/wordpress";
-import { processWPContent } from "@/lib/process-wp-content";
-import { Section, Container } from "@/components/craft";
+import { getPageBySlug, getAllPages, getTemplateBySlug } from "@/lib/wordpress";
+import { processWPContent, applyTemplate } from "@/lib/process-wp-content";
+import { Section } from "@/components/craft";
 import { siteConfig } from "@/site.config";
+import Balancer from "react-wrap-balancer";
+import parse from "html-react-parser";
 
 import type { Metadata } from "next";
 
@@ -73,19 +75,29 @@ export default async function Page({
   const { slug } = await params;
   const page = await getPageBySlug(slug);
 
-  // Check if the page uses a no-title template
-  const shouldHideTitle = isNoTitleTemplate(page.template);
+  // Fetch the WordPress template
+  const template = await getTemplateBySlug('page');
 
+  if (template) {
+    // Apply template with content
+    const templatedContent = applyTemplate(template.content.raw, {
+      title: page.title.rendered,
+      content: page.content.rendered,
+    });
+
+    // Process WordPress classes to Tailwind
+    const processedContent = processWPContent(templatedContent);
+
+    return <>{parse(processedContent)}</>;
+  }
+
+  // Fallback if template not available
   return (
     <Section>
-      <Container>
-        <div className="">
-          {!shouldHideTitle && (
-            <h2>{page.title.rendered}</h2>
-          )}
-          <div dangerouslySetInnerHTML={{ __html: processWPContent(page.content.rendered) }} />
-        </div>
-      </Container>
+      <h2>
+        <Balancer>{page.title.rendered}</Balancer>
+      </h2>
+      {parse(processWPContent(page.content.rendered))}
     </Section>
   );
 }

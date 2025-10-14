@@ -180,8 +180,7 @@ const styles = {
   layout: {
     spacing: "",
     article: "",
-    container: "container mx-auto",
-    section: "",
+    section: "container mx-auto px-4",
   },
 };
 
@@ -202,7 +201,13 @@ export const Layout = ({ children, className }: BaseProps) => (
 );
 
 export const Main = ({ children, className, id }: BaseProps) => (
-  <main className={cn(baseTypographyStyles, className)} id={id}>
+  <main
+    className={cn(
+      baseTypographyStyles,
+      className
+    )}
+    id={id || "wp--skip-link--target"}
+  >
     {children}
   </main>
 );
@@ -211,12 +216,6 @@ export const Section = ({ children, className, id }: BaseProps) => (
   <section className={cn(styles.layout.section, className)} id={id}>
     {children}
   </section>
-);
-
-export const Container = ({ children, className, id }: BaseProps) => (
-  <div className={cn(styles.layout.container, className)} id={id}>
-    {children}
-  </div>
 );
 
 export const Article = ({

@@ -8,7 +8,7 @@ import {
 } from "@/lib/wordpress";
 import { processWPContent } from "@/lib/process-wp-content";
 
-import { Section, Container, Article } from "@/components/craft";
+import { Section, Article } from "@/components/craft";
 import { badgeVariants } from "@/components/ui/badge";
 import { StructuredData } from "@/components/seo/structured-data";
 import { cn } from "@/lib/utils";
@@ -115,7 +115,7 @@ export default async function Page({
     <>
       {post.seo?.schema && <StructuredData schema={post.seo.schema} />}
       <Section>
-        <Container>
+        
         <div className="">
           <h1>
             <Balancer>
@@ -157,7 +157,7 @@ export default async function Page({
         </div>
 
         <Article dangerouslySetInnerHTML={{ __html: processWPContent(post.content.rendered) }} />
-      </Container>
+      
     </Section>
     </>
   );

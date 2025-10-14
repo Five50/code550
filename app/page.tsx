@@ -1,11 +1,12 @@
-import {Section, Container, Article} from "@/components/craft";
+import {Section} from "@/components/craft";
 import {PostCard} from "@/components/posts/post-card";
 import {HeaderSettings} from "@/components/header-settings";
-import {getFrontPageContent, getPostsPaginated, isNoTitleTemplate} from "@/lib/wordpress";
-import {processWPContent} from "@/lib/process-wp-content";
+import {getFrontPageContent, getPostsPaginated, getTemplateBySlug} from "@/lib/wordpress";
+import {processWPContent, applyTemplate} from "@/lib/process-wp-content";
 import {siteConfig} from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
+import parse from "html-react-parser";
 import type {Metadata} from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,26 +45,38 @@ export default async function Home() {
         const frontPage = await getFrontPageContent();
 
         if (frontPage.type === 'page' && frontPage.content) {
-            // Static front page
-            const shouldHideTitle = isNoTitleTemplate(frontPage.content);
-            const isFixedHeader = isNoTitleTemplate(frontPage.content);
+            // Static front page - fetch and apply template
+            const template = await getTemplateBySlug('page');
 
+            if (template) {
+                // Apply template with content
+                const templatedContent = applyTemplate(template.content.raw, {
+                    title: frontPage.content.title.rendered,
+                    content: frontPage.content.content.rendered,
+                });
+
+                // Process WordPress classes to Tailwind
+                const processedContent = processWPContent(templatedContent);
+
+                return (
+                    <>
+                        <HeaderSettings isFixedPosition={false}/>
+                        {parse(processedContent)}
+                    </>
+                );
+            }
+
+            // Fallback if template not available
             return (
                 <>
-                    <HeaderSettings isFixedPosition={isFixedHeader}/>
+                    <HeaderSettings isFixedPosition={false}/>
                     <Section>
-                        <Container>
-                            {!shouldHideTitle && (
-                                <div>
-                                    <h1>
-                                        <Balancer>
-                                            <span dangerouslySetInnerHTML={{__html: frontPage.content.title.rendered}}/>
-                                        </Balancer>
-                                    </h1>
-                                </div>
-                            )}
-                            <Article dangerouslySetInnerHTML={{__html: processWPContent(frontPage.content.content.rendered)}}/>
-                        </Container>
+                        <h1>
+                            <Balancer>
+                                {parse(frontPage.content.title.rendered)}
+                            </Balancer>
+                        </h1>
+                        {parse(processWPContent(frontPage.content.content.rendered))}
                     </Section>
                 </>
             );
@@ -76,41 +89,39 @@ export default async function Home() {
             <>
                 <HeaderSettings isFixedPosition={false}/>
                 <Section>
-                    <Container>
-                        <div className="flex flex-col gap-8">
-                            <div className="text-center">
-                                <h1 className="text-4xl font-bold mb-4">
-                                    <Balancer>{frontPage.settings.blogname || "Latest Posts"}</Balancer>
-                                </h1>
-                                {frontPage.settings.blogdescription && (
-                                    <p className="text-lg text-muted-foreground">
-                                        <Balancer>{frontPage.settings.blogdescription}</Balancer>
-                                    </p>
-                                )}
-                            </div>
-
-                            {posts.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {posts.map((post) => (
-                                        <PostCard key={post.id} post={post}/>
-                                    ))}
-                                </div>
-                            ) : (
-                                <FallbackHomepage/>
-                            )}
-
-                            {posts.length > 0 && (
-                                <div className="text-center">
-                                    <Link
-                                        href="/blog"
-                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-600 h-10 px-4 py-2"
-                                    >
-                                        View All Posts
-                                    </Link>
-                                </div>
+                    <div className="flex flex-col gap-8">
+                        <div className="text-center">
+                            <h1 className="text-4xl font-bold mb-4">
+                                <Balancer>{frontPage.settings.blogname || "Latest Posts"}</Balancer>
+                            </h1>
+                            {frontPage.settings.blogdescription && (
+                                <p className="text-lg text-muted-foreground">
+                                    <Balancer>{frontPage.settings.blogdescription}</Balancer>
+                                </p>
                             )}
                         </div>
-                    </Container>
+
+                        {posts.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {posts.map((post) => (
+                                    <PostCard key={post.id} post={post}/>
+                                ))}
+                            </div>
+                        ) : (
+                            <FallbackHomepage/>
+                        )}
+
+                        {posts.length > 0 && (
+                            <div className="text-center">
+                                <Link
+                                    href="/blog"
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-600 h-10 px-4 py-2"
+                                >
+                                    View All Posts
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </Section>
             </>
         );

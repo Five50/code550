@@ -1,5 +1,5 @@
 import { getAllAuthors } from "@/lib/wordpress";
-import { Section, Container } from "@/components/craft";
+import { Section } from "@/components/craft";
 import { Metadata } from "next";
 import BackButton from "@/components/back";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default async function Page() {
 
   return (
     <Section>
-      <Container className="space-y-6">
+      
         <div className="mb-8">
           <h2>All Authors</h2>
           <ul className="grid">
@@ -29,7 +29,7 @@ export default async function Page() {
           </ul>
         </div>
         <BackButton />
-      </Container>
+      
     </Section>
   );
 }

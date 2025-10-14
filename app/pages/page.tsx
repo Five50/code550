@@ -1,5 +1,5 @@
 import { getAllPages } from "@/lib/wordpress";
-import { Section, Container } from "@/components/craft";
+import { Section } from "@/components/craft";
 import { Metadata } from "next";
 import BackButton from "@/components/back";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default async function Page() {
 
   return (
     <Section>
-      <Container className="space-y-6">
+      
           <h2>All Pages</h2>
           <ul className="grid">
             {pages.map((page: any) => (
@@ -27,7 +27,7 @@ export default async function Page() {
             ))}
           </ul>
         <BackButton />
-      </Container>
+      
     </Section>
   );
 }
