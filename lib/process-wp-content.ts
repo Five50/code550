@@ -328,6 +328,9 @@ export function processWPContent(html: string): string {
       // Base classes for block groups
       let tailwindClasses = [];
 
+      // Preserve constrained width classes if they exist
+      const constrainedWidthMatch = classes.match(/\[&>?\*\]:max-w-\[720px\]|\[&>?\*\]:mx-auto/g);
+
       // Check for specific WordPress classes and map to Tailwind
       if (classes.includes('has-global-padding')) {
         tailwindClasses.push('px-6');
@@ -344,6 +347,11 @@ export function processWPContent(html: string): string {
       // Default constrained layout (900px)
       else if (classes.includes('is-layout-constrained')) {
         tailwindClasses.push('max-w-[900px] mx-auto');
+      }
+
+      // Add back the constrained width classes if they existed
+      if (constrainedWidthMatch) {
+        tailwindClasses.push(...constrainedWidthMatch);
       }
 
       return tailwindClasses.length > 0 ? `class="${tailwindClasses.join(' ')}"` : '';
