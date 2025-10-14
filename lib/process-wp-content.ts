@@ -325,8 +325,8 @@ export function processWPContent(html: string): string {
   processedHtml = processedHtml.replace(
     /class=["']([^"']*\bwp-block-group\b[^"']*)["']/gi,
     (match, classes) => {
-      // Base classes for block groups
-      let tailwindClasses = [];
+      // Base classes for block groups - default flex column layout with gap
+      let tailwindClasses = ['flex', 'flex-col', 'gap-4'];
 
       // Preserve constrained width classes if they exist
       const constrainedWidthMatch = classes.match(/(?:\[&>?\*\]|\*):max-w-(?:\[720px\]|3xl|\[768px\]|7xl|\[1280px\])|(?:\[&>?\*\]|\*):mx-auto/g);

@@ -19,6 +19,8 @@ export const SAFELIST_CLASSES = [
   'pb-4', 'pb-6', 'pb-8', 'pb-10', 'pb-12', 'pb-16', 'pb-20', 'pb-24',
   // Padding left
   'pl-4', 'pl-6', 'pl-8', 'pl-10', 'pl-12', 'pl-16', 'pl-20', 'pl-24',
+  // Flexbox layout
+  'flex', 'flex-col', 'flex-row',
   // Gap
   'gap-4', 'gap-6', 'gap-8', 'gap-10', 'gap-12', 'gap-16', 'gap-20', 'gap-24',
   // Margin
@@ -51,6 +53,8 @@ export function SafelistComponent() {
       <div className="pb-4 pb-6 pb-8 pb-10 pb-12 pb-16 pb-20 pb-24" />
       {/* Padding left */}
       <div className="pl-4 pl-6 pl-8 pl-10 pl-12 pl-16 pl-20 pl-24" />
+      {/* Flexbox layout */}
+      <div className="flex flex-col flex-row" />
       {/* Gap */}
       <div className="gap-4 gap-6 gap-8 gap-10 gap-12 gap-16 gap-20 gap-24" />
       {/* Margin */}
