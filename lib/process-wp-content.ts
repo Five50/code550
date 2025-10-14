@@ -166,9 +166,9 @@ export function processWPContent(html: string): string {
     (_match, classes) => {
       let tailwindClasses = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
 
-      // Handle alignwide for wider layouts
+      // Handle alignwide for wider layouts - use !important to override parent constraints
       if (classes.includes('alignwide')) {
-        tailwindClasses += ' max-w-7xl mx-auto';
+        tailwindClasses += ' !max-w-7xl mx-auto';
       }
 
       return `class="${tailwindClasses}"`;
