@@ -287,51 +287,6 @@ export function processWPContent(html: string): string {
   processHeading('h5', headingClasses.h5);
   processHeading('h6', headingClasses.h6);
 
-  // Apply constrained width to direct children of wp-block-group
-  // This mimics WordPress's .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) behavior
-  processedHtml = processedHtml.replace(
-    /<div([^>]*class="[^"]*wp-block-group[^"]*"[^>]*)>([\s\S]*?)<\/div>/gi,
-    (match, groupAttrs, groupContent) => {
-      // Process direct children - match opening tags of common block elements
-      const processedContent = groupContent.replace(
-        /<(h[1-6]|p|div|ul|ol|blockquote|figure)([^>]*)>/gi,
-        (match, tagName, attributes) => {
-          // Skip if already has alignment or width classes
-          if (
-            attributes.includes('alignleft') ||
-            attributes.includes('alignright') ||
-            attributes.includes('alignfull') ||
-            attributes.includes('alignwide') ||
-            attributes.includes('max-w-') ||
-            attributes.includes('w-screen') ||
-            attributes.includes('wp-block-group')
-          ) {
-            return match;
-          }
-
-          // Add classes to existing class attribute, or create new class attribute
-          let updatedAttributes = attributes;
-          if (attributes.match(/class=/i)) {
-            // Has class attribute - add to it
-            updatedAttributes = attributes.replace(
-              /class=(["'])([^"']*)\1/i,
-              (classMatch, quote, classValue) => {
-                return `class=${quote}${classValue} max-w-[720px] mx-auto${quote}`;
-              }
-            );
-          } else {
-            // No class attribute - add one
-            updatedAttributes = ` class="max-w-[720px] mx-auto"${attributes}`;
-          }
-
-          return `<${tagName}${updatedAttributes}>`;
-        }
-      );
-
-      return `<div${groupAttrs}>${processedContent}</div>`;
-    }
-  );
-
   // Convert WordPress text alignment classes to Tailwind
   // Pattern: has-text-align-{alignment} → text-{alignment}
   processedHtml = processedHtml.replace(

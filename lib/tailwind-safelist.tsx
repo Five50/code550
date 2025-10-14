@@ -33,8 +33,6 @@ export const SAFELIST_CLASSES = [
   'text-7xl', 'text-8xl', 'text-9xl',
   // Text alignment (WordPress alignment classes)
   'text-left', 'text-center', 'text-right', 'text-justify',
-  // Constrained width (WordPress .is-layout-constrained children)
-  'max-w-[720px]', 'mx-auto',
 ];
 
 /**
@@ -63,8 +61,6 @@ export function SafelistComponent() {
       <div className="text-xs text-sm text-base text-lg text-xl text-2xl text-3xl text-4xl text-5xl text-6xl text-7xl text-8xl text-9xl" />
       {/* Text alignment */}
       <div className="text-left text-center text-right text-justify" />
-      {/* Constrained width */}
-      <div className="max-w-[720px] mx-auto" />
     </div>
   );
 }
