@@ -249,8 +249,8 @@ export function processWPContent(html: string): string {
     '$1$2'
   );
 
-  // Replace heading classes - handles wp-block-heading with optional WordPress font size classes
-  // Converts has-text-{size}-font-size to text-{size}
+  // Replace heading classes - handles wp-block-heading with optional WordPress font size and alignment classes
+  // Converts has-text-{size}-font-size to text-{size} and has-text-align-{alignment} to text-{alignment}
   const processHeading = (tag: string, defaultClasses: string) => {
     const regex = new RegExp(`<${tag}\\s+class=["']([^"']*\\bwp-block-heading\\b[^"']*)["']`, 'gi');
     processedHtml = processedHtml.replace(regex, (_match, classes) => {
@@ -266,6 +266,14 @@ export function processWPContent(html: string): string {
         // Only remove font size classes (text-xs, text-sm, etc.), not color classes (text-slate-900)
         tailwindClasses = tailwindClasses.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/g, '').trim();
         tailwindClasses += ` text-${size}`;
+      }
+
+      // Convert WordPress text alignment classes to Tailwind
+      // Pattern: has-text-align-{alignment} → text-{alignment}
+      const alignmentMatch = classes.match(/has-text-align-(left|center|right|justify)/i);
+      if (alignmentMatch) {
+        const alignment = alignmentMatch[1];
+        tailwindClasses += ` text-${alignment}`;
       }
 
       return `<${tag} class="${tailwindClasses}"`;
