@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "tailwind:build": "tailwindcss -i ./styles/input.css -o ./styles/output.css --watch",
-    "tailwind:build-prod": "tailwindcss -i ./styles/input.css -o ./styles/output.css --minify",
-    "dev": "concurrently \"npm run tailwind:build\" \"next dev --turbo\" --kill-others",
-    "build": "npm run tailwind:build-prod && next build",
+    "dev": "next dev --turbo",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
@@ -51,7 +49,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.55.1",
-    "@tailwindcss/cli": "^4.1.14",
+    "@tailwindcss/postcss": "^4.1.14",
     "@tailwindcss/typography": "^0.5.0-alpha.3",
     "@testing-library/jest-dom": "^6.9.0",
     "@testing-library/react": "^16.3.0",

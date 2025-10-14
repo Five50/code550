@@ -1,4 +1,4 @@
-import "../styles/output.css";
+import "../styles/input.css";
 
 import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/layout/header";
