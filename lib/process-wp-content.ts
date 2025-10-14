@@ -423,6 +423,43 @@ export function processWPContent(html: string): string {
         }
       });
 
+      // Convert direct CSS padding values to Tailwind arbitrary values if not already converted
+      if (!convertedStyles.includes('padding-top')) {
+        const paddingTopMatch = styleContent.match(/padding-top:\s*([^;]+)/i);
+        if (paddingTopMatch && !paddingTopMatch[1].includes('var(')) {
+          const value = paddingTopMatch[1].trim();
+          tailwindClasses.push(`pt-[${value}]`);
+          convertedStyles.push('padding-top');
+        }
+      }
+
+      if (!convertedStyles.includes('padding-bottom')) {
+        const paddingBottomMatch = styleContent.match(/padding-bottom:\s*([^;]+)/i);
+        if (paddingBottomMatch && !paddingBottomMatch[1].includes('var(')) {
+          const value = paddingBottomMatch[1].trim();
+          tailwindClasses.push(`pb-[${value}]`);
+          convertedStyles.push('padding-bottom');
+        }
+      }
+
+      if (!convertedStyles.includes('padding-left')) {
+        const paddingLeftMatch = styleContent.match(/padding-left:\s*([^;]+)/i);
+        if (paddingLeftMatch && !paddingLeftMatch[1].includes('var(')) {
+          const value = paddingLeftMatch[1].trim();
+          tailwindClasses.push(`pl-[${value}]`);
+          convertedStyles.push('padding-left');
+        }
+      }
+
+      if (!convertedStyles.includes('padding-right')) {
+        const paddingRightMatch = styleContent.match(/padding-right:\s*([^;]+)/i);
+        if (paddingRightMatch && !paddingRightMatch[1].includes('var(')) {
+          const value = paddingRightMatch[1].trim();
+          tailwindClasses.push(`pr-[${value}]`);
+          convertedStyles.push('padding-right');
+        }
+      }
+
       // Convert margin
       if (styleContent.includes('margin-top:0') && styleContent.includes('margin-bottom:0')) {
         tailwindClasses.push('my-0');
