@@ -37,6 +37,8 @@ export const SAFELIST_CLASSES = [
   'text-left', 'text-center', 'text-right', 'text-justify',
   // Constrained width for wp-block-group children (direct child variants)
   '*:max-w-3xl', '*:max-w-7xl', '*:mx-auto',
+  // Important max-width for alignwide override
+  '!max-w-7xl',
 ];
 
 /**
@@ -69,6 +71,8 @@ export function SafelistComponent() {
       <div className="text-left text-center text-right text-justify" />
       {/* Constrained width for wp-block-group children */}
       <div className="*:max-w-3xl *:max-w-7xl *:mx-auto" />
+      {/* Important max-width for alignwide override */}
+      <div className="!max-w-7xl" />
     </div>
   );
 }

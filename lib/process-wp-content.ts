@@ -338,7 +338,7 @@ export function processWPContent(html: string): string {
 
       // Add alignwide support for wider content (1280px)
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('*:max-w-7xl *:mx-auto');
+        tailwindClasses.push('!max-w-7xl mx-auto *:max-w-7xl *:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
@@ -370,7 +370,7 @@ export function processWPContent(html: string): string {
 
       // Add alignwide support for wider content (1280px)
       if (classes.includes('alignwide')) {
-        tailwindClasses.push('*:max-w-7xl *:mx-auto');
+        tailwindClasses.push('!max-w-7xl mx-auto *:max-w-7xl *:mx-auto');
       }
       // Add alignfull support for full-width sections
       else if (classes.includes('alignfull')) {
