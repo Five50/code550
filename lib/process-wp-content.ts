@@ -344,9 +344,9 @@ export function processWPContent(html: string): string {
       else if (classes.includes('alignfull')) {
         tailwindClasses.push('w-screen max-w-full');
       }
-      // Default constrained layout (900px)
+      // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('max-w-[900px] mx-auto');
+        tailwindClasses.push('[&>*]:max-w-[720px] [&>*]:mx-auto');
       }
 
       // Add back the constrained width classes if they existed
@@ -376,9 +376,9 @@ export function processWPContent(html: string): string {
       else if (classes.includes('alignfull')) {
         tailwindClasses.push('w-screen max-w-full');
       }
-      // Default constrained layout (900px)
+      // Default constrained layout - apply child constraints
       else if (classes.includes('is-layout-constrained')) {
-        tailwindClasses.push('max-w-[900px] mx-auto');
+        tailwindClasses.push('[&>*]:max-w-[720px] [&>*]:mx-auto');
       }
 
       // Add content-specific classes
