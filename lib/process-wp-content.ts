@@ -292,6 +292,11 @@ export function processWPContent(html: string): string {
   processedHtml = processedHtml.replace(
     /<div([^>]*class=")([^"]*wp-block-group[^"]*)("[^>]*)>/gi,
     (match, beforeClass, classValue, afterClass) => {
+      // Skip adding default classes if alignwide or alignfull - those will be handled in later processing
+      if (classValue.includes('alignwide') || classValue.includes('alignfull')) {
+        return match; // Return unchanged
+      }
+
       // Check if content justification is set to left (which means don't center children)
       const hasLeftJustification = classValue.includes('is-content-justification-left');
 
@@ -332,9 +337,6 @@ export function processWPContent(html: string): string {
       // Base classes for block groups - default flex column layout with gap
       let tailwindClasses = ['flex', 'flex-col', 'gap-4'];
 
-      // Preserve constrained width classes if they exist
-      const constrainedWidthMatch = classes.match(/(?:\[&>?\*\]|\*):max-w-(?:\[720px\]|3xl|\[768px\]|5xl|\[1024px\])|(?:\[&>?\*\]|\*):mx-auto/g);
-
       // Check for specific WordPress classes and map to Tailwind
       if (classes.includes('has-global-padding')) {
         tailwindClasses.push('px-6');
@@ -356,11 +358,6 @@ export function processWPContent(html: string): string {
       else if (classes.includes('is-layout-constrained')) {
         const childClasses = hasLeftJustification ? '*:max-w-3xl' : '*:max-w-3xl *:mx-auto';
         tailwindClasses.push(childClasses);
-      }
-
-      // Add back the constrained width classes if they existed
-      if (constrainedWidthMatch) {
-        tailwindClasses.push(...constrainedWidthMatch);
       }
 
       return tailwindClasses.length > 0 ? `class="${tailwindClasses.join(' ')}"` : '';
