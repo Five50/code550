@@ -1,7 +1,7 @@
 import { Section } from "@/components/craft";
 import { Button } from "@/components/ui/button";
 
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 
 export default function NotFound() {
   return (

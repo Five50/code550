@@ -9,7 +9,6 @@ import { TemplateUpdater } from "@/components/template-updater";
 import { getPrimaryNavigation, getGlobalStyles, getTemplateForPath } from "@/lib/wordpress";
 import Script from "next/script";
 import { headers } from "next/headers";
-import { ViewTransitions } from 'next-view-transitions';
 
 import { siteConfig } from "@/site.config";
 import { cn } from "@/lib/utils";
@@ -78,16 +77,14 @@ export default async function RootLayout({
         )}
         data-template={template}
       >
-        <ViewTransitions>
-          <ThemeProvider>
-            <TemplateUpdater initialTemplate={template} />
-            <HeaderProvider>
-              {!isProductionDomain && <Header navigationItems={navigationItems} />}
-              {children}
-              {!isProductionDomain && <Footer />}
-            </HeaderProvider>
-          </ThemeProvider>
-        </ViewTransitions>
+        <ThemeProvider>
+          <TemplateUpdater initialTemplate={template} />
+          <HeaderProvider>
+            {!isProductionDomain && <Header navigationItems={navigationItems} />}
+            {children}
+            {!isProductionDomain && <Footer />}
+          </HeaderProvider>
+        </ThemeProvider>
         <Analytics />
 
         {/* Alpine.js */}

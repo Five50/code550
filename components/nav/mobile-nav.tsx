@@ -2,7 +2,7 @@
 
 // React and Next Imports
 import * as React from "react";
-import { Link, type LinkProps } from "next-view-transitions";
+import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
 
 // Utility Imports

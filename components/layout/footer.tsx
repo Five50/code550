@@ -9,7 +9,7 @@ import {Github, Twitter, Linkedin, TrendingUp, Shield, Zap} from "lucide-react";
 import Balancer from "react-wrap-balancer";
 import Logo from "@/public/altofuel-light-inline.svg";
 import Image from "next/image";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 
 interface FooterProps {
     className?: string;
