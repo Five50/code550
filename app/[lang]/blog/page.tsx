@@ -6,7 +6,7 @@ import {
   getAllAuthors,
   getBlogPageContent,
 } from "@/lib/wordpress";
-import { processWPContent } from "@/lib/process-wp-content";
+
 
 import { Section, Article } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
@@ -103,7 +103,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                     </h1>
                   </div>
                   {blogPage.page.content.rendered && (
-                    <Article dangerouslySetInnerHTML={{ __html: processWPContent(blogPage.page.content.rendered) }} />
+                    <Article dangerouslySetInnerHTML={{ __html: blogPage.page.content.rendered }} />
                   )}
                 </>
               ) : (

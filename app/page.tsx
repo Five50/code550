@@ -1,12 +1,9 @@
-import {Section} from "@/components/craft";
-import {PostCard} from "@/components/posts/post-card";
 import {HeaderSettings} from "@/components/header-settings";
-import {getFrontPageContent, getPostsPaginated, getTemplateBySlug} from "@/lib/wordpress";
-import {processWPContent, applyTemplate} from "@/lib/process-wp-content";
+import {getFrontPageContent, getPostsPaginated, getPostStyles} from "@/lib/wordpress";
+import {filterWpStyles} from "@/lib/filter-wp-styles";
+import {FrontPageTemplate} from "@/components/templates/front-page";
+
 import {siteConfig} from "@/site.config";
-import Balancer from "react-wrap-balancer";
-import Link from "next/link";
-import parse from "html-react-parser";
 import type {Metadata} from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,39 +42,17 @@ export default async function Home() {
         const frontPage = await getFrontPageContent();
 
         if (frontPage.type === 'page' && frontPage.content) {
-            // Static front page - fetch and apply template
-            const template = await getTemplateBySlug('page');
+            // Static front page - fetch styles and render with template
+            const rawStyles = await getPostStyles(frontPage.content.id);
+            const pageStyles = filterWpStyles(rawStyles);
 
-            if (template) {
-                // Apply template with content
-                const templatedContent = applyTemplate(template.content.raw, {
-                    title: frontPage.content.title.rendered,
-                    content: frontPage.content.content.rendered,
-                });
-
-                // Process WordPress classes to Tailwind
-                const processedContent = processWPContent(templatedContent);
-
-                return (
-                    <>
-                        <HeaderSettings isFixedPosition={false}/>
-                        {parse(processedContent)}
-                    </>
-                );
-            }
-
-            // Fallback if template not available
             return (
                 <>
                     <HeaderSettings isFixedPosition={false}/>
-                    <Section>
-                        <h1>
-                            <Balancer>
-                                {parse(frontPage.content.title.rendered)}
-                            </Balancer>
-                        </h1>
-                        {parse(processWPContent(frontPage.content.content.rendered))}
-                    </Section>
+                    <FrontPageTemplate
+                        page={frontPage.content}
+                        styles={pageStyles}
+                    />
                 </>
             );
         }
@@ -88,41 +63,11 @@ export default async function Home() {
         return (
             <>
                 <HeaderSettings isFixedPosition={false}/>
-                <Section>
-                    <div className="flex flex-col gap-8">
-                        <div className="text-center">
-                            <h1 className="text-4xl font-bold mb-4">
-                                <Balancer>{frontPage.settings.blogname || "Latest Posts"}</Balancer>
-                            </h1>
-                            {frontPage.settings.blogdescription && (
-                                <p className="text-lg text-muted-foreground">
-                                    <Balancer>{frontPage.settings.blogdescription}</Balancer>
-                                </p>
-                            )}
-                        </div>
-
-                        {posts.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {posts.map((post) => (
-                                    <PostCard key={post.id} post={post}/>
-                                ))}
-                            </div>
-                        ) : (
-                            <FallbackHomepage/>
-                        )}
-
-                        {posts.length > 0 && (
-                            <div className="text-center">
-                                <Link
-                                    href="/blog"
-                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-600 h-10 px-4 py-2"
-                                >
-                                    View All Posts
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </Section>
+                <FrontPageTemplate
+                    posts={posts.length > 0 ? posts : undefined}
+                    blogName={frontPage.settings.blogname}
+                    blogDescription={frontPage.settings.blogdescription}
+                />
             </>
         );
     } catch (error) {
@@ -198,13 +143,11 @@ const ToDelete = () => {
                     {/* Hero Section */}
                     <div className="space-y-6">
                         <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight">
-                            <Balancer>Next Generation Alternative Fuel Intelligence</Balancer>
+                            Next Generation Alternative Fuel Intelligence
                         </h1>
                         <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto">
-                            <Balancer>
-                                Advanced analytics and insights for the alternative fuel industry.
-                                Powered by real-time data and industry expertise.
-                            </Balancer>
+                            Advanced analytics and insights for the alternative fuel industry.
+                            Powered by real-time data and industry expertise.
                         </p>
                     </div>
 

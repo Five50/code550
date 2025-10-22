@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { type ThemeProviderProps } from "next-themes";
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  // Force dark mode initialization on mount
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  // Force dark mode on mount
   React.useEffect(() => {
-    // Ensure dark class is on html element
     if (typeof window !== 'undefined') {
       const html = document.documentElement;
       if (!html.classList.contains('dark')) {
@@ -16,5 +17,5 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     }
   }, []);
 
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  return <>{children}</>;
 }

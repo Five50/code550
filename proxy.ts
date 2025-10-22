@@ -6,23 +6,32 @@ export type SupportedLanguage = typeof supportedLanguages[number];
 
 export const defaultLanguage: SupportedLanguage = 'en';
 
-// Language detection and routing middleware
-export function middleware(request: NextRequest) {
+// Language detection and routing proxy
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip middleware for certain paths
+  // Create request headers with pathname for layout access
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+
+  // Skip proxy for certain paths
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/robots.txt') ||
     pathname.startsWith('/sitemap.xml') ||
+    pathname.startsWith('/blog') || // Skip blog page
     pathname.startsWith('/posts/') || // Keep /posts/ for archive pages
     pathname.startsWith('/pages/') || // Keep /pages/ for archive pages
     pathname.includes('.') ||
     pathname === '/'
   ) {
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   // Check if pathname starts with a supported language
@@ -32,7 +41,11 @@ export function middleware(request: NextRequest) {
 
   if (pathnameHasLocale) {
     // If URL already has a language prefix, continue
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   // For WordPress-style URLs (direct post/page slugs), handle language detection
@@ -51,7 +64,11 @@ export function middleware(request: NextRequest) {
   }
 
   // For default language (English), we don't add a prefix
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 function detectLanguage(acceptLanguage: string): SupportedLanguage {
@@ -80,6 +97,6 @@ function detectLanguage(acceptLanguage: string): SupportedLanguage {
 export const config = {
   matcher: [
     // Skip all internal paths (_next, api, etc.)
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+    '/((?!api/|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 };

@@ -1,9 +1,9 @@
-import { getPageBySlug, getAllPages, getTemplateBySlug } from "@/lib/wordpress";
-import { processWPContent, applyTemplate } from "@/lib/process-wp-content";
-import { Section } from "@/components/craft";
+import { getPageBySlug, getAllPages, getPostStyles } from "@/lib/wordpress";
+import { filterWpStyles } from "@/lib/filter-wp-styles";
+
+import { PageTemplate } from "@/components/templates/page";
+import { PageNoTitleTemplate } from "@/components/templates/page-no-title";
 import { siteConfig } from "@/site.config";
-import Balancer from "react-wrap-balancer";
-import parse from "html-react-parser";
 
 import type { Metadata } from "next";
 
@@ -75,29 +75,17 @@ export default async function Page({
   const { slug } = await params;
   const page = await getPageBySlug(slug);
 
-  // Fetch the WordPress template
-  const template = await getTemplateBySlug('page');
+  // Fetch page-specific styles from WordPress
+  const rawStyles = await getPostStyles(page.id);
+  const pageStyles = filterWpStyles(rawStyles);
 
-  if (template) {
-    // Apply template with content
-    const templatedContent = applyTemplate(template.content.raw, {
-      title: page.title.rendered,
-      content: page.content.rendered,
-    });
+  // Check if this page uses the no-title template
+  const isNoTitle = page.template === 'page-no-title';
 
-    // Process WordPress classes to Tailwind
-    const processedContent = processWPContent(templatedContent);
-
-    return <>{parse(processedContent)}</>;
+  // Use appropriate template based on page settings
+  if (isNoTitle) {
+    return <PageNoTitleTemplate page={page} styles={pageStyles} />;
   }
 
-  // Fallback if template not available
-  return (
-    <Section>
-      <h2>
-        <Balancer>{page.title.rendered}</Balancer>
-      </h2>
-      {parse(processWPContent(page.content.rendered))}
-    </Section>
-  );
+  return <PageTemplate page={page} styles={pageStyles} />;
 }

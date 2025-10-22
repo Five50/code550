@@ -1,23 +1,12 @@
 import {
   getPostBySlug,
-  getFeaturedMediaById,
-  getAuthorById,
-  getCategoryById,
   getAllPostSlugs,
-  getTemplateBySlug,
-  isNoTitleTemplate,
-  isNoMetaTemplate,
+  getPostStyles,
 } from "@/lib/wordpress";
-import { processWPContent, applyTemplate } from "@/lib/process-wp-content";
+import { filterWpStyles } from "@/lib/filter-wp-styles";
 
-import { Section } from "@/components/craft";
-import { badgeVariants } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { SingleTemplate } from "@/components/templates/single";
 import { siteConfig } from "@/site.config";
-
-import Link from "next/link";
-import Balancer from "react-wrap-balancer";
-import parse from "html-react-parser";
 
 import type { Metadata } from "next";
 
@@ -75,81 +64,13 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  // Fetch post with embedded data (author, categories, tags, featured media)
   const post = await getPostBySlug(slug);
-  const featuredMedia = post.featured_media
-    ? await getFeaturedMediaById(post.featured_media)
-    : null;
-  const author = await getAuthorById(post.author);
-  const date = new Date(post.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-  const category = await getCategoryById(post.categories[0]);
 
-  // Check template settings
-  const shouldHideTitle = isNoTitleTemplate(post.template);
-  const shouldHideMeta = isNoMetaTemplate(post.template);
+  // Fetch post-specific styles from WordPress
+  const rawStyles = await getPostStyles(post.id);
+  const postStyles = filterWpStyles(rawStyles);
 
-  // Fetch the WordPress template for posts (use "singular" template)
-  const template = await getTemplateBySlug('singular');
-
-  if (template && shouldHideTitle && shouldHideMeta) {
-    // If using template and hiding title/meta, use full template structure
-    const templatedContent = applyTemplate(template.content.raw, {
-      title: post.title.rendered,
-      content: post.content.rendered,
-      featuredImage: featuredMedia?.source_url,
-    });
-
-    const processedContent = processWPContent(templatedContent);
-    return <>{parse(processedContent)}</>;
-  }
-
-  // Fallback to custom layout if template not available or showing meta
-  return (
-    <Section>
-      {!shouldHideTitle && (
-        <h1>
-          <Balancer>
-            {parse(post.title.rendered)}
-          </Balancer>
-        </h1>
-      )}
-      {!shouldHideMeta && (
-        <div className="flex justify-between items-center gap-4 text-sm mb-4">
-          <h5>
-            Published {date} by{" "}
-            {author.name && (
-              <span>
-                <a href={`/posts/?author=${author.id}`}>{author.name}</a>{" "}
-              </span>
-            )}
-          </h5>
-
-          <Link
-            href={`/posts/?category=${category.id}`}
-            className={cn(
-              badgeVariants({ variant: "outline" }),
-              "!no-underline"
-            )}
-          >
-            {category.name}
-          </Link>
-        </div>
-      )}
-      {featuredMedia?.source_url && (
-        <div className="h-96 my-12 md:h-[500px] overflow-hidden flex items-center justify-center border rounded-lg bg-accent/25">
-          {/* eslint-disable-next-line */}
-          <img
-            className="w-full h-full object-cover"
-            src={featuredMedia.source_url}
-            alt={post.title.rendered}
-          />
-        </div>
-      )}
-
-      {parse(processWPContent(post.content.rendered))}
-    </Section>
-  );
+  return <SingleTemplate post={post} styles={postStyles} />;
 }

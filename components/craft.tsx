@@ -140,47 +140,11 @@ const styles = {
       "[&_ol_ul]:pl-6",
       "[&_ul_ol]:pl-6",
     ],
-    code: [
-      "[&_code]:relative [&_code]:rounded [&_code]:bg-muted/50 [&_code]:px-[0.3rem] [&_code]:py-[0.2rem] [&_code]:font-mono [&_code]:text-sm [&_code]:font-medium",
-      "[&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:border [&_pre]:bg-muted/50 [&_pre]:p-4 [&_pre]:my-4",
-      "[&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-sm",
-      "[&_pre_code]:block [&_pre_code]:w-full",
-    ],
-    tables: [
-      "[&_table]:w-full [&_table]:my-4 [&_table]:overflow-x-auto [&_table]:rounded-lg [&_table]:border",
-      "[&_thead]:bg-muted/50",
-      "[&_tr]:border-b [&_tr]:last:border-0",
-      "[&_th]:border-r [&_th]:px-4 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:last:border-0",
-      "[&_td]:border-r [&_td]:px-4 [&_td]:py-2 [&_td]:last:border-0",
-    ],
-    media: [
-      "[&_img]:rounded-lg [&_img]:border [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto",
-      "[&_video]:rounded-lg [&_video]:border [&_video]:my-4",
-      "[&_figure]:my-4",
-      "[&_figure_img]:my-0",
-      "[&_figure_figcaption]:text-sm [&_figure_figcaption]:mt-2 [&_figure_figcaption]:text-muted-foreground",
-    ],
-    misc: [
-      "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:py-1 [&_blockquote]:my-4 [&_blockquote]:text-muted-foreground",
-      "[&_blockquote_blockquote]:mt-4",
-      "[&_hr]:my-8 [&_hr]:border-t-2 [&_hr]:border-muted",
-      "[&_abbr]:cursor-help [&_abbr]:underline [&_abbr]:underline-dotted [&_abbr]:underline-offset-4",
-      "[&_details]:rounded-lg [&_details]:border [&_details]:px-4 [&_details]:py-2 [&_details]:my-4",
-      "[&_summary]:cursor-pointer [&_summary]:font-semibold",
-      "[&_kbd]:rounded-md [&_kbd]:border [&_kbd]:bg-muted/50 [&_kbd]:px-1.5 [&_kbd]:py-0.5 [&_kbd]:text-sm [&_kbd]:font-mono",
-      "[&_mark]:bg-primary/10 [&_mark]:px-1",
-      "[&_::selection]:bg-primary/10",
-      // Footnotes
-      "[&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t",
-      "[&_.footnotes_ol]:list-decimal [&_.footnotes_ol]:ml-6",
-      "[&_.footnote-ref]:text-xs [&_.footnote-ref]:align-super [&_.footnote-ref]:ml-0.5",
-      "[&_.footnote-backref]:no-underline hover:[&_.footnote-backref]:underline",
-    ],
   },
   layout: {
     spacing: "",
     article: "",
-    section: "container mx-auto px-4",
+    section: "w-full",
   },
 };
 
@@ -198,18 +162,6 @@ export const Layout = ({ children, className }: BaseProps) => (
   >
     {children}
   </html>
-);
-
-export const Main = ({ children, className, id }: BaseProps) => (
-  <main
-    className={cn(
-      baseTypographyStyles,
-      className
-    )}
-    id={id || "wp--skip-link--target"}
-  >
-    {children}
-  </main>
 );
 
 export const Section = ({ children, className, id }: BaseProps) => (

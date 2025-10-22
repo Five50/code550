@@ -1,4 +1,4 @@
-import { supportedLanguages, defaultLanguage, SupportedLanguage } from '../middleware';
+import { supportedLanguages, defaultLanguage, SupportedLanguage } from '../proxy';
 
 // Language configuration
 export const languageConfig = {

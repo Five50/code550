@@ -4,23 +4,18 @@ import {
   getPageBySlugWithLanguage,
   getPostWithSEO,
   getPageWithSEO,
-  getFeaturedMediaById,
-  getAuthorById,
-  getCategoryById,
+  getPostStyles,
   getAllPostSlugs,
   getAllPages,
   getBlogPageContent
 } from '@/lib/wordpress';
+import { filterWpStyles } from '@/lib/filter-wp-styles';
 import { getLanguageFromPathname, normalizeLanguage, removeLanguagePrefix } from '@/lib/i18n';
-import { processWPContent } from '@/lib/process-wp-content';
-import { Section, Article } from '@/components/craft';
-import { badgeVariants } from '@/components/ui/badge';
+import { SingleTemplate } from '@/components/templates/single';
+import { PageTemplate } from '@/components/templates/page';
+import { PageNoTitleTemplate } from '@/components/templates/page-no-title';
 import { StructuredData } from '@/components/seo/structured-data';
-import { cn } from '@/lib/utils';
 import { siteConfig } from '@/site.config';
-import Link from 'next/link';
-import Image from 'next/image';
-import Balancer from 'react-wrap-balancer';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -189,83 +184,35 @@ export default async function DynamicPage({ params }: PageProps) {
 
 // Post component
 async function PostPage({ post }: { post: any }) {
-  const featuredMedia = post.featured_media
-    ? await getFeaturedMediaById(post.featured_media)
-    : null;
-  const author = await getAuthorById(post.author);
-  const date = new Date(post.date).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-  const category = post.categories[0] ? await getCategoryById(post.categories[0]) : null;
+  // Fetch post-specific styles from WordPress
+  const rawStyles = await getPostStyles(post.id);
+  const postStyles = filterWpStyles(rawStyles);
 
   return (
     <>
       {post.seo?.schema && <StructuredData schema={post.seo.schema} />}
-      <Section>
-        <div className="view-transition-content">
-          <h1>
-            <Balancer>
-              <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
-            </Balancer>
-          </h1>
-          <div className="flex justify-between items-center gap-4 text-sm mb-4">
-            <h5>
-              Published {date} by{' '}
-              {author.name && (
-                <span>
-                  <Link href={`/posts/?author=${author.id}`}>{author.name}</Link>
-                </span>
-              )}
-            </h5>
-
-            {category && (
-              <Link
-                href={`/posts/?category=${category.id}`}
-                className={cn(
-                  badgeVariants({ variant: 'outline' }),
-                  '!no-underline'
-                )}
-              >
-                {category.name}
-              </Link>
-            )}
-          </div>
-          {featuredMedia?.source_url && (
-            <div className="h-96 my-12 md:h-[500px] overflow-hidden flex items-center justify-center border rounded-lg bg-accent/25">
-              <Image
-                className="w-full h-full object-cover"
-                src={featuredMedia.source_url}
-                alt={post.title.rendered}
-                width={800}
-                height={500}
-              />
-            </div>
-          )}
-        <Article dangerouslySetInnerHTML={{ __html: processWPContent(post.content.rendered) }} />
-        </div>
-      </Section>
+      <SingleTemplate post={post} styles={postStyles} />
     </>
   );
 }
 
 // Page component
-function PageContent({ page }: { page: any }) {
+async function PageContent({ page }: { page: any }) {
+  // Fetch page-specific styles from WordPress
+  const rawStyles = await getPostStyles(page.id);
+  const pageStyles = filterWpStyles(rawStyles);
+
+  // Check if this page uses the no-title template
+  const isNoTitle = page.template === 'page-no-title';
+
   return (
     <>
       {page.seo?.schema && <StructuredData schema={page.seo.schema} />}
-      <Section>
-        <div className="view-transition-content">
-          <h1>
-            <Balancer>
-              <span dangerouslySetInnerHTML={{ __html: page.title.rendered }} />
-            </Balancer>
-          </h1>
-
-        <Article dangerouslySetInnerHTML={{ __html: processWPContent(page.content.rendered) }} />
-        </div>
-      </Section>
+      {isNoTitle ? (
+        <PageNoTitleTemplate page={page} styles={pageStyles} />
+      ) : (
+        <PageTemplate page={page} styles={pageStyles} />
+      )}
     </>
   );
 }

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { TransitionLink } from "@/components/ui/transition-link";
 import { MegaMenu } from "@/components/nav/mega-menu";
 import { MegaMenuContainer } from "@/components/nav/mega-menu-container";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useHeader } from "@/lib/header-context";
 import { navigationMenu } from "@/menu.config";
 import { siteConfig } from "@/site.config";
@@ -16,7 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { ChevronDown, Menu } from "lucide-react";
 
 import { useState } from "react";
 
@@ -28,6 +34,7 @@ interface HeaderProps {
 export function Header({ className, navigationItems = [] }: HeaderProps) {
   const { isFixedPosition } = useHeader();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Use WordPress navigation if available, otherwise fall back to static config
   const useWordPressNav = navigationItems && navigationItems.length > 0;
@@ -36,15 +43,15 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
     <>
       <header
         className={cn(
-          "sticky top-0 z-[100] py-4 px-4 xl:px-0 bg-slate-900 backdrop-blur-[5px]",
+          "sticky top-0 z-[100] py-4 px-4 xl:px-0 bg-white dark:bg-slate-900 backdrop-blur-[5px] shadow-xs shadow-blue-500/10 transition-all",
           className
         )}
         style={{ viewTransitionName: 'header' }}
         role="banner"
       >
-        <div className="container mx-auto flex items-center justify-between">
-          {/* Site Logo and Navigation */}
-          <div className="flex items-center gap-8">
+        <div className="w-full max-w-5xl mx-auto flex items-center justify-between">
+          {/* Site Logo and Mobile Menu Button */}
+          <div className="flex items-center gap-4">
             <TransitionLink
               href="/"
               className="hover:opacity-75 transition-opacity flex items-center gap-3"
@@ -82,8 +89,132 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
               </svg>
             </TransitionLink>
 
-            {/* Main Navigation */}
-            <nav className="flex items-center space-x-1" role="navigation" aria-label="Main navigation">
+            {/* Mobile Menu Button - Visible only on Mobile */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="lg:hidden text-slate-400 hover:text-white"
+                  aria-label="Open navigation menu"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-slate-900 border-slate-800">
+                <SheetHeader>
+                  <SheetTitle className="text-left text-white">Navigation</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col space-y-1 mt-6" role="navigation" aria-label="Mobile navigation">
+                  {useWordPressNav ? (
+                    // WordPress menu items for mobile
+                    navigationItems.map((item) => {
+                      if (item.children && item.children.length > 0) {
+                        return (
+                          <div key={item.id} className="space-y-1">
+                            <div className="text-sm font-medium px-3 py-2 text-slate-300">
+                              {item.title}
+                            </div>
+                            <div className="pl-4 space-y-1">
+                              {item.children.map((child) => (
+                                <TransitionLink
+                                  key={child.id}
+                                  href={child.url}
+                                  className="block text-sm px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
+                                  target={child.target || undefined}
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  {child.title}
+                                </TransitionLink>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <TransitionLink
+                          key={item.id}
+                          href={item.url}
+                          className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
+                          target={item.target || undefined}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.title}
+                        </TransitionLink>
+                      );
+                    })
+                  ) : (
+                    // Static config menu items for mobile
+                    Object.entries(navigationMenu).map(([key, item]) => {
+                      if ('type' in item && item.type === 'mega') {
+                        return (
+                          <div key={key} className="space-y-1">
+                            <div className="text-sm font-medium px-3 py-2 text-slate-300">
+                              {item.title}
+                            </div>
+                            {Object.entries(item.sections).map(([sectionKey, section]) => (
+                              <div key={sectionKey} className="pl-4 space-y-1">
+                                <div className="text-xs font-medium px-3 py-1 text-slate-500">
+                                  {section.title}
+                                </div>
+                                {Object.entries(section.items).map(([label, linkData]) => {
+                                  const link = linkData as { href: string; description: string };
+                                  return (
+                                    <TransitionLink
+                                      key={link.href}
+                                      href={link.href}
+                                      className="block text-sm px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
+                                      onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                      {label}
+                                    </TransitionLink>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      } else if ('items' in item) {
+                        return (
+                          <div key={key} className="space-y-1">
+                            <div className="text-sm font-medium px-3 py-2 text-slate-300">
+                              {item.title}
+                            </div>
+                            <div className="pl-4 space-y-1">
+                              {Object.entries(item.items).map(([label, href]) => (
+                                <TransitionLink
+                                  key={href}
+                                  href={href}
+                                  className="block text-sm px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  {label}
+                                </TransitionLink>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      } else if ('href' in item) {
+                        return (
+                          <TransitionLink
+                            key={key}
+                            href={item.href}
+                            className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {item.title}
+                          </TransitionLink>
+                        );
+                      }
+                      return null;
+                    })
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            {/* Desktop Navigation - Hidden on Mobile */}
+            <nav className="hidden lg:flex items-center space-x-1" role="navigation" aria-label="Main navigation">
             {useWordPressNav ? (
               // Render WordPress menu items
               navigationItems.map((item) => {
@@ -193,16 +324,13 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
+          <div className="flex items-center gap-2">
             {/* Call-to-Action Buttons */}
             <Button
               variant="ghost"
               size="sm"
               asChild
-              className="text-sm font-medium text-slate-400 border border-blue-600/10 transition-colors"
+              className="hidden sm:flex text-sm font-medium text-slate-400 border border-blue-600/10 transition-colors"
             >
               <TransitionLink href="/signin">
                 Sign In
@@ -211,9 +339,11 @@ export function Header({ className, navigationItems = [] }: HeaderProps) {
             <Button
               size="sm"
               asChild
+              className="text-xs sm:text-sm px-2 sm:px-3"
             >
               <TransitionLink href="/book-a-demo" aria-label="Book a Demo">
-                Book a Demo
+                <span className="hidden sm:inline">Book a Demo</span>
+                <span className="sm:hidden">Demo</span>
               </TransitionLink>
             </Button>
           </div>

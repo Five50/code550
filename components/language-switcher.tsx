@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { supportedLanguages, SupportedLanguage } from '../middleware';
+import { supportedLanguages, SupportedLanguage } from '../proxy';
 import { languageConfig, getLanguageFromPathname, addLanguagePrefix, removeLanguagePrefix } from '../lib/i18n';
 
 interface LanguageSwitcherProps {

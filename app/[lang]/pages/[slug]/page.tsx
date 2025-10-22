@@ -1,5 +1,5 @@
 import { getPageBySlug, getAllPages, getTemplateBySlug } from "@/lib/wordpress";
-import { processWPContent, applyTemplate } from "@/lib/process-wp-content";
+
 import { Section } from "@/components/craft";
 import { siteConfig } from "@/site.config";
 import Balancer from "react-wrap-balancer";
@@ -79,16 +79,8 @@ export default async function Page({
   const template = await getTemplateBySlug('page');
 
   if (template) {
-    // Apply template with content
-    const templatedContent = applyTemplate(template.content.raw, {
-      title: page.title.rendered,
-      content: page.content.rendered,
-    });
-
-    // Process WordPress classes to Tailwind
-    const processedContent = processWPContent(templatedContent);
-
-    return <>{parse(processedContent)}</>;
+    // Use template content directly
+    return <>{parse(template.content.raw)}</>;
   }
 
   // Fallback if template not available
@@ -97,7 +89,7 @@ export default async function Page({
       <h2>
         <Balancer>{page.title.rendered}</Balancer>
       </h2>
-      {parse(processWPContent(page.content.rendered))}
+      {parse(page.content.rendered)}
     </Section>
   );
 }

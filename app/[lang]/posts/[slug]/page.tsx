@@ -6,7 +6,7 @@ import {
   getAllPostSlugs,
   getPostWithSEO,
 } from "@/lib/wordpress";
-import { processWPContent } from "@/lib/process-wp-content";
+
 
 import { Section, Article } from "@/components/craft";
 import { badgeVariants } from "@/components/ui/badge";
@@ -156,7 +156,7 @@ export default async function Page({
           )}
         </div>
 
-        <Article dangerouslySetInnerHTML={{ __html: processWPContent(post.content.rendered) }} />
+        <Article dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
       
     </Section>
     </>
