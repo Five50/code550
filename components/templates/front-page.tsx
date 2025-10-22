@@ -1,7 +1,7 @@
 import { Section, Article } from "@/components/craft";
 import { PostCard } from "@/components/posts/post-card";
 import parse from "html-react-parser";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 interface FrontPageTemplateProps {
   page?: any;
