@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+// Parse hostname from WORDPRESS_URL so images.remotePatterns stays in sync
+const wpUrl = process.env.WORDPRESS_URL;
+const wpHostname = wpUrl ? new URL(wpUrl).hostname : undefined;
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -9,7 +13,18 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      ...(wpHostname && wpHostname !== process.env.WORDPRESS_HOSTNAME
+        ? [{ protocol: "https" as const, hostname: wpHostname, port: "", pathname: "/**" }]
+        : []),
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/media/:path*",
+        destination: `${process.env.WORDPRESS_URL}/wp-content/uploads/:path*`,
+      },
+    ];
   },
 };
 
