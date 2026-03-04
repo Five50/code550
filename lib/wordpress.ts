@@ -57,7 +57,7 @@ async function wordpressFetch<T>(
     query = { lang: language };
   }
 
-  // Normalize URL to avoid double slashes
+  // Strip trailing/leading slashes to prevent "//wp-json" in the URL
   const normalizedBaseUrl = baseUrl?.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const url = `${normalizedBaseUrl}${normalizedPath}${
@@ -69,7 +69,7 @@ async function wordpressFetch<T>(
     "User-Agent": userAgent,
   };
 
-  // Always send auth headers when credentials are available
+  // HTTP Basic auth — used for private endpoints (settings, edit context, templates)
   if (process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
     const credentials = Buffer.from(
       `${process.env.WORDPRESS_AUTH_USER}:${process.env.WORDPRESS_AUTH_PASSWORD}`
@@ -79,9 +79,10 @@ async function wordpressFetch<T>(
 
   const response = await fetch(url, {
     headers,
+    // Next.js ISR: tag-based revalidation + 1-hour TTL
     next: {
       tags: language ? ["wordpress", `lang-${language}`] : ["wordpress"],
-      revalidate: 3600, // 1 hour cache
+      revalidate: 3600,
     },
   });
 
@@ -142,6 +143,7 @@ async function wordpressFetchWithPagination<T>(
 
   const data = await response.json();
 
+  // WP REST API returns pagination info via custom headers
   return {
     data,
     headers: {
@@ -709,7 +711,8 @@ export async function getPageWithSEO(slug: string, language?: string): Promise<P
   };
 }
 
-// Helper function to parse RankMath head content
+// Extracts SEO meta from the raw <head> HTML returned by RankMath's getHead endpoint.
+// Each regex targets a specific meta tag pattern (name=, property=, rel=).
 function parseRankMathHead(headContent: string): RankMathSEO {
   const seoData: RankMathSEO = {};
 
@@ -776,7 +779,8 @@ function parseRankMathHead(headContent: string): RankMathSEO {
 export function checkTemplate(template: string | undefined, templateType: string): boolean {
   if (!template) return false;
 
-  // Gutenberg block theme template patterns
+  // Match against all known WordPress template naming conventions:
+  // Gutenberg block themes, classic PHP themes, and slug-based patterns
   const patterns = [
     templateType,
     `page-${templateType}`,
@@ -792,6 +796,7 @@ export function checkTemplate(template: string | undefined, templateType: string
     `template-${templateType}`,
   ];
 
+  // Exact match first, then fall back to substring match for custom variations
   return patterns.some(pattern =>
     template === pattern || template.includes(templateType)
   );
@@ -1319,11 +1324,10 @@ export async function getTemplateForPath(pathname: string): Promise<string> {
 export function sanitizeContentUrls(html: string): string {
   if (!html || !baseUrl) return html;
 
-  // Remove trailing slash from baseUrl for consistent matching
   const wpOrigin = baseUrl.replace(/\/$/, '');
 
-  // Replace WordPress image URLs with Next.js image optimization proxy
-  // Matches src="https://wp-domain.com/wp-content/uploads/..." patterns
+  // Regex captures: (src=["']) followed by the WP origin and an uploads path.
+  // Rewrites to /_next/image?url=<encoded>&w=1200&q=75 for Next.js image optimization.
   return html.replace(
     new RegExp(`(src=["'])${escapeRegExp(wpOrigin)}(/wp-content/uploads/[^"']+)`, 'g'),
     (_, prefix, path) => {
