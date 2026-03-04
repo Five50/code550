@@ -3,6 +3,7 @@
 // Types are imported from `wp.d.ts`
 
 import querystring from "query-string";
+import { siteConfig } from "@/site.config";
 import type {
   Post,
   Category,
@@ -68,8 +69,8 @@ async function wordpressFetch<T>(
     "User-Agent": userAgent,
   };
 
-  // Add authentication for protected endpoints
-  if (requiresAuth && process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
+  // Always send auth headers when credentials are available
+  if (process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
     const credentials = Buffer.from(
       `${process.env.WORDPRESS_AUTH_USER}:${process.env.WORDPRESS_AUTH_PASSWORD}`
     ).toString('base64');
@@ -108,10 +109,19 @@ async function wordpressFetchWithPagination<T>(
   }`;
   const userAgent = "Next.js WordPress Client";
 
+  const fetchHeaders: HeadersInit = {
+    "User-Agent": userAgent,
+  };
+
+  if (process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
+    const credentials = Buffer.from(
+      `${process.env.WORDPRESS_AUTH_USER}:${process.env.WORDPRESS_AUTH_PASSWORD}`
+    ).toString('base64');
+    fetchHeaders.Authorization = `Basic ${credentials}`;
+  }
+
   const response = await fetch(url, {
-    headers: {
-      "User-Agent": userAgent,
-    },
+    headers: fetchHeaders,
     next: {
       tags: ["wordpress"],
       revalidate: 3600, // 1 hour cache
@@ -184,10 +194,19 @@ export async function getPostsPaginated(
   }`;
   const userAgent = "Next.js WordPress Client";
 
+  const paginatedHeaders: HeadersInit = {
+    "User-Agent": userAgent,
+  };
+
+  if (process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
+    const credentials = Buffer.from(
+      `${process.env.WORDPRESS_AUTH_USER}:${process.env.WORDPRESS_AUTH_PASSWORD}`
+    ).toString('base64');
+    paginatedHeaders.Authorization = `Basic ${credentials}`;
+  }
+
   const response = await fetch(url, {
-    headers: {
-      "User-Agent": userAgent,
-    },
+    headers: paginatedHeaders,
     next: {
       tags: cacheTags,
       revalidate: 3600, // 1 hour cache
@@ -1201,7 +1220,7 @@ export async function getTemplateById(id: string): Promise<WordPressTemplate | n
 export async function getGlobalStyles(): Promise<string> {
   try {
     const response = await wordpressFetch<{ css: string }>(
-      `/wp-json/altofuel-wp/v1/global-styles-css`
+      `/wp-json/${siteConfig.wpPluginNamespace}/v1/global-styles-css`
     );
     return response.css || '';
   } catch (error) {
@@ -1218,7 +1237,7 @@ export async function getGlobalStyles(): Promise<string> {
 export async function getPostStyles(postId: number): Promise<string> {
   try {
     const response = await wordpressFetch<{ styles: string }>(
-      `/wp-json/altofuel-wp/v1/post-styles/${postId}`
+      `/wp-json/${siteConfig.wpPluginNamespace}/v1/post-styles/${postId}`
     );
     return response.styles || '';
   } catch (error) {
@@ -1283,6 +1302,31 @@ export async function getTemplateForPath(pathname: string): Promise<string> {
     console.warn(`Error determining template for path ${pathname}:`, error);
     return 'default';
   }
+}
+
+/**
+ * Rewrite WordPress-domain image URLs in HTML content to use Next.js image proxy.
+ * Prevents the WordPress domain from leaking in rendered HTML.
+ */
+export function sanitizeContentUrls(html: string): string {
+  if (!html || !baseUrl) return html;
+
+  // Remove trailing slash from baseUrl for consistent matching
+  const wpOrigin = baseUrl.replace(/\/$/, '');
+
+  // Replace WordPress image URLs with Next.js image optimization proxy
+  // Matches src="https://wp-domain.com/wp-content/uploads/..." patterns
+  return html.replace(
+    new RegExp(`(src=["'])${escapeRegExp(wpOrigin)}(/wp-content/uploads/[^"']+)`, 'g'),
+    (_, prefix, path) => {
+      const encodedUrl = encodeURIComponent(`${wpOrigin}${path}`);
+      return `${prefix}/_next/image?url=${encodedUrl}&w=1200&q=75`;
+    }
+  );
+}
+
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 export { WordPressAPIError };

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 import { getAllPosts, getPostBySlug, getAllCategories, getAllAuthors } from '@/lib/wordpress';
@@ -7,6 +7,34 @@ describe('WordPress API Integration Tests', () => {
   beforeEach(() => {
     // Reset any runtime request handlers
     server.resetHandlers();
+  });
+
+  it('should always include Authorization header when credentials are set', async () => {
+    let capturedAuthHeader: string | null = null;
+
+    server.use(
+      http.get('*/wp-json/wp/v2/posts', ({ request }) => {
+        capturedAuthHeader = request.headers.get('Authorization');
+        return HttpResponse.json([{
+          id: 1, slug: 'test-post', title: { rendered: 'Test' },
+          content: { rendered: '', protected: false },
+          excerpt: { rendered: '', protected: false },
+          date: '', date_gmt: '', modified: '', modified_gmt: '',
+          status: 'publish', link: '', guid: { rendered: '' },
+          author: 1, featured_media: 0, comment_status: 'open',
+          ping_status: 'open', sticky: false, template: '',
+          format: 'standard', meta: {}, categories: [], tags: []
+        }]);
+      })
+    );
+
+    await getAllPosts();
+
+    // Auth headers should be present since env vars are set in test setup
+    if (process.env.WORDPRESS_AUTH_USER && process.env.WORDPRESS_AUTH_PASSWORD) {
+      expect(capturedAuthHeader).toBeTruthy();
+      expect(capturedAuthHeader).toMatch(/^Basic /);
+    }
   });
 
   it('should fetch all posts successfully', async () => {

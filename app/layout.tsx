@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AltoFuel - Next Generation Alternative Fuel Intelligence",
+  title: siteConfig.site_name,
   description: siteConfig.site_description,
   metadataBase: new URL(siteConfig.site_domain),
   alternates: {
@@ -55,10 +55,10 @@ export default async function RootLayout({
           />
         )}
 
-        {/* WordPress Block Library Styles - Core Gutenberg block styles */}
+        {/* WordPress Block Library Styles - proxied to hide WP origin */}
         <link
           rel="stylesheet"
-          href="https://digest.altofuel.com/wp-includes/css/dist/block-library/style.min.css"
+          href="/api/wp-css"
         />
 
         <script
