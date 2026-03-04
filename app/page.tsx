@@ -30,9 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-    // Only show landing page on actual production domain, not on preview/dev deployments
-    const isProductionDomain = process.env.VERCEL_ENV === 'production' &&
-        process.env.VERCEL_URL === siteConfig.site_domain.replace('https://', '');
+    const isProductionDomain = process.env.VERCEL_ENV === 'production';
 
     if (isProductionDomain) {
         return <FallbackHomepage/>;

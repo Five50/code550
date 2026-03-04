@@ -40,9 +40,7 @@ export default async function RootLayout({
   const pathname = headersList.get('x-pathname') || '/';
   const template = await getTemplateForPath(pathname);
 
-  // Only show landing page on actual production domain, not on preview/dev deployments
-  const isProductionDomain = process.env.VERCEL_ENV === 'production' &&
-    process.env.VERCEL_URL === siteConfig.site_domain.replace('https://', '');
+  const isProductionDomain = process.env.VERCEL_ENV === 'production';
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
