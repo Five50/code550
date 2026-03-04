@@ -21,18 +21,22 @@ import type { Metadata } from "next";
 import { normalizeLanguage } from "@/lib/i18n";
 
 export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs();
-  const params = [];
+  try {
+    const slugs = await getAllPostSlugs();
+    const params = [];
 
-  // Generate params for each language
-  for (const { slug } of slugs) {
-    params.push(
-      { lang: 'en', slug },
-      { lang: 'es', slug }
-    );
+    // Generate params for each language
+    for (const { slug } of slugs) {
+      params.push(
+        { lang: 'en', slug },
+        { lang: 'es', slug }
+      );
+    }
+
+    return params;
+  } catch {
+    return [];
   }
-
-  return params;
 }
 
 export async function generateMetadata({

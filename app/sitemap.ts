@@ -4,10 +4,13 @@ import { siteConfig } from "@/site.config";
 import { supportedLanguages } from "@/proxy";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, pages] = await Promise.all([
-    getAllPosts(),
-    getAllPages()
-  ]);
+  let posts: Awaited<ReturnType<typeof getAllPosts>> = [];
+  let pages: Awaited<ReturnType<typeof getAllPages>> = [];
+  try {
+    [posts, pages] = await Promise.all([getAllPosts(), getAllPages()]);
+  } catch {
+    // WordPress API unavailable — return static URLs only
+  }
 
   const staticUrls: MetadataRoute.Sitemap = [
     {
