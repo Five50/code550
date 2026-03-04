@@ -11,11 +11,12 @@ import type { Metadata } from "next";
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  const pages = await getAllPages();
-
-  return pages.map((page) => ({
-    slug: page.slug,
-  }));
+  try {
+    const pages = await getAllPages();
+    return pages.map((page) => ({ slug: page.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

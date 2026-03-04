@@ -11,7 +11,11 @@ import { siteConfig } from "@/site.config";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
-  return await getAllPostSlugs();
+  try {
+    return await getAllPostSlugs();
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
