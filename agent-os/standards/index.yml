@@ -1,0 +1,13 @@
+# Agent OS Standards Index
+
+backend:
+  cache-tags:
+    description: Cache tag naming and revalidation strategy for WordPress fetches
+  graceful-degradation:
+    description: Try/catch pattern for optional WordPress plugins
+  language-support:
+    description: WPML language parameter convention for data functions
+  slug-lookups:
+    description: Fetching WordPress resources by slug via collection endpoints
+  wordpress-fetch:
+    description: Centralized fetch functions for all WordPress API calls

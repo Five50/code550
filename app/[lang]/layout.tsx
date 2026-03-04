@@ -1,4 +1,5 @@
 import { isValidLanguage, normalizeLanguage } from '../../lib/i18n';
+import { siteConfig } from '../../site.config';
 import { notFound } from 'next/navigation';
 
 interface LanguageLayoutProps {
@@ -18,8 +19,5 @@ export default async function LanguageLayout({ children, params }: LanguageLayou
 }
 
 export async function generateStaticParams() {
-  return [
-    { lang: 'en' },
-    { lang: 'es' },
-  ];
+  return siteConfig.supportedLanguages.map((lang) => ({ lang }));
 }

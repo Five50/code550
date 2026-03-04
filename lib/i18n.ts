@@ -1,18 +1,8 @@
-import { supportedLanguages, defaultLanguage, SupportedLanguage } from '../proxy';
+import { supportedLanguages, defaultLanguage } from '../proxy';
+import { siteConfig, type SupportedLanguage } from '../site.config';
 
-// Language configuration
-export const languageConfig = {
-  en: {
-    name: 'English',
-    nativeName: 'English',
-    flag: '🇺🇸',
-  },
-  es: {
-    name: 'Spanish',
-    nativeName: 'Español',
-    flag: '🇪🇸',
-  },
-} as const;
+// Language configuration - read from siteConfig
+export const languageConfig = siteConfig.languageLabels;
 
 // Get language from pathname
 export function getLanguageFromPathname(pathname: string): SupportedLanguage {

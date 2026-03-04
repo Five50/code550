@@ -12,6 +12,10 @@ export default defineConfig({
     css: true,
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['tests/e2e/**', 'node_modules/**'],
+    env: {
+      WORDPRESS_URL: 'https://test.example.com',
+      WORDPRESS_HOSTNAME: 'test.example.com',
+    },
   },
   resolve: {
     alias: {

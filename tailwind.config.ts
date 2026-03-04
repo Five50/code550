@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import { siteConfig } from './site.config'
 
 export default {
   darkMode: 'class',
@@ -11,9 +12,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Fira Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        heading: ['Saira', 'Fira Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['Fira Mono', 'ui-monospace', 'SFMono-Regular', 'SF Mono', 'monospace'],
+        sans: siteConfig.fonts.sans,
+        heading: siteConfig.fonts.heading,
+        mono: siteConfig.fonts.mono,
       },
     },
   },

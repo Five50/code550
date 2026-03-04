@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { siteConfig, type SupportedLanguage } from './site.config';
 
-// Supported languages
-export const supportedLanguages = ['en', 'es'] as const;
-export type SupportedLanguage = typeof supportedLanguages[number];
-
-export const defaultLanguage: SupportedLanguage = 'en';
+// Re-export for consumers
+export type { SupportedLanguage };
+export const supportedLanguages = siteConfig.supportedLanguages;
+export const defaultLanguage: SupportedLanguage = siteConfig.defaultLanguage;
 
 // Language detection and routing proxy
 export function proxy(request: NextRequest) {
@@ -21,9 +21,9 @@ export function proxy(request: NextRequest) {
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/robots.txt') ||
     pathname.startsWith('/sitemap.xml') ||
-    pathname.startsWith('/blog') || // Skip blog page
-    pathname.startsWith('/posts/') || // Keep /posts/ for archive pages
-    pathname.startsWith('/pages/') || // Keep /pages/ for archive pages
+    pathname.startsWith('/blog') ||
+    pathname.startsWith('/posts/') ||
+    pathname.startsWith('/pages/') ||
     pathname.includes('.') ||
     pathname === '/'
   ) {
@@ -40,7 +40,6 @@ export function proxy(request: NextRequest) {
   );
 
   if (pathnameHasLocale) {
-    // If URL already has a language prefix, continue
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -53,9 +52,7 @@ export function proxy(request: NextRequest) {
   const detectedLanguage = detectLanguage(acceptLanguage);
 
   // Only redirect to language prefix for non-default languages
-  // This allows direct URLs like /my-post or /my-page to work in English
   if (detectedLanguage !== defaultLanguage) {
-    // Check if this is a potential post/page slug (not an archive page)
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length === 1) {
       const redirectUrl = new URL(`/${detectedLanguage}${pathname}`, request.url);
@@ -63,7 +60,6 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // For default language (English), we don't add a prefix
   return NextResponse.next({
     request: {
       headers: requestHeaders,
@@ -72,7 +68,6 @@ export function proxy(request: NextRequest) {
 }
 
 function detectLanguage(acceptLanguage: string): SupportedLanguage {
-  // Parse Accept-Language header
   const languages = acceptLanguage
     .split(',')
     .map(lang => {
@@ -84,7 +79,6 @@ function detectLanguage(acceptLanguage: string): SupportedLanguage {
     })
     .sort((a, b) => b.quality - a.quality);
 
-  // Find first supported language
   for (const lang of languages) {
     if (supportedLanguages.includes(lang.code as SupportedLanguage)) {
       return lang.code as SupportedLanguage;
@@ -96,7 +90,6 @@ function detectLanguage(acceptLanguage: string): SupportedLanguage {
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next, api, etc.)
     '/((?!api/|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 };

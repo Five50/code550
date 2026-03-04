@@ -3,7 +3,7 @@
 /* Configure class-based dark mode for Tailwind v4 */
 @variant dark (.dark &);
 
-/* AltoFuel Brand Fonts */
+/* Brand Fonts */
 @font-face {
   font-family: 'Saira';
   src: url('/fonts/saira/Saira-VariableFont_wdth,wght.woff2') format('woff2-variations');
