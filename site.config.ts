@@ -85,11 +85,11 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
 
   // Fallback homepage
   fallbackHomepage: {
-    heading: "Welcome",
-    description: "Your site description here.",
-    ctaUrl: null,
-    ctaLabel: "Get Started",
-    supportEmail: null,
+    heading: "Next Generation Alternative Fuel Intelligence",
+    description: "Advanced analytics and insights for the alternative fuel industry. Powered by real-time data and industry expertise.",
+    ctaUrl: "https://app.altofuel.com",
+    ctaLabel: "Access Platform",
+    supportEmail: "info@altofuel.com",
   },
 
   // Footer

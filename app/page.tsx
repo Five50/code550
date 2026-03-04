@@ -83,6 +83,10 @@ function FallbackHomepage() {
         <div className="min-h-screen flex flex-col bg-slate-900">
             <main className="flex-1 flex items-center justify-center px-4">
                 <div className="max-w-4xl mx-auto text-center space-y-8 py-20">
+                    <div className="flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo-dark.svg" alt={siteConfig.site_name} className="h-14 w-auto" />
+                    </div>
                     <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight">
                         {heading}
                     </h1>
