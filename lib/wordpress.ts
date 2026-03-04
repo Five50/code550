@@ -21,10 +21,6 @@ import type {
 
 const baseUrl = process.env.WORDPRESS_URL;
 
-if (!baseUrl) {
-  throw new Error("WORDPRESS_URL environment variable is not defined");
-}
-
 class WordPressAPIError extends Error {
   constructor(message: string, public status: number, public endpoint: string) {
     super(message);
@@ -50,6 +46,10 @@ async function wordpressFetch<T>(
   language?: string,
   requiresAuth: boolean = false
 ): Promise<T> {
+  if (!baseUrl) {
+    throw new Error("WORDPRESS_URL environment variable is not defined");
+  }
+
   // Add language parameter for WPML support
   if (language && query) {
     query.lang = language;
@@ -101,8 +101,12 @@ async function wordpressFetchWithPagination<T>(
   path: string,
   query?: Record<string, any>
 ): Promise<WordPressResponse<T>> {
+  if (!baseUrl) {
+    throw new Error("WORDPRESS_URL environment variable is not defined");
+  }
+
   // Normalize URL to avoid double slashes
-  const normalizedBaseUrl = baseUrl?.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const url = `${normalizedBaseUrl}${normalizedPath}${
     query ? `?${querystring.stringify(query)}` : ""
@@ -158,6 +162,10 @@ export async function getPostsPaginated(
     search?: string;
   }
 ): Promise<WordPressResponse<Post[]>> {
+  if (!baseUrl) {
+    throw new Error("WORDPRESS_URL environment variable is not defined");
+  }
+
   const query: Record<string, any> = {
     _embed: true,
     per_page: perPage,
