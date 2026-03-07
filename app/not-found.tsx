@@ -1,20 +1,24 @@
-import { Section } from "@/components/craft";
-import { Button } from "@/components/ui/button";
-
 import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <Section>
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-          <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
-          <p className="mb-8">
-            Sorry, the page you are looking for does not exist.
-          </p>
-          <Button asChild className="mt-6">
-            <Link href="/">Return Home</Link>
-          </Button>
-        </div>
-    </Section>
+    <div className="flex min-h-[80vh] flex-col items-center justify-center bg-background px-4 text-center">
+      <h1 className="font-[family-name:var(--font-display)] text-[8rem] font-bold leading-none tracking-tighter text-primary sm:text-[12rem]">
+        404
+      </h1>
+      <h2 className="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold text-foreground sm:text-3xl">
+        Page Not Found
+      </h2>
+      <p className="mt-4 max-w-md text-muted-foreground">
+        The page you are looking for doesn&apos;t exist or has been moved. Check
+        the URL or head back to the homepage.
+      </p>
+      <Link
+        href="/"
+        className="mt-8 inline-flex items-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+      >
+        Go Home
+      </Link>
+    </div>
   );
 }

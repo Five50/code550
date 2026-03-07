@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
         : []),
     ],
   },
+  async redirects() {
+    return [
+      { source: '/posts/:slug', destination: '/blog/:slug', permanent: true },
+      { source: '/posts', destination: '/blog', permanent: true },
+      { source: '/pages/:slug', destination: '/:slug', permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       {
