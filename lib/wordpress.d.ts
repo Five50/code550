@@ -347,3 +347,80 @@ export interface MenuLocation {
 export interface MenusResponse {
   [key: string]: Menu; // Menu slug => Menu object
 }
+
+// Service CPT
+export interface Service extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  excerpt: RenderedContent;
+  featured_media: number;
+  template: string;
+  meta: Record<string, unknown>;
+  acf: {
+    icon: string;
+    description: string;
+    features: string[];
+    deliverables: string[];
+    stats: Array<{ value: string; label: string }>;
+    process_steps: Array<{ title: string; description: string }>;
+    sort_order: number;
+  };
+}
+
+// Case Study CPT
+export interface CaseStudy extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  excerpt: RenderedContent;
+  featured_media: number;
+  template: string;
+  meta: Record<string, unknown>;
+  'project-category': number[];
+  acf: {
+    client_name: string;
+    tagline: string;
+    industry: string;
+    duration: string;
+    team_size: string;
+    challenge: string;
+    solution: string[];
+    technologies: string[];
+    deliverables: string[];
+    results: Array<{
+      metric: string;
+      before: string;
+      after: string;
+      trend: 'up' | 'down';
+    }>;
+    testimonial_quote: string;
+    testimonial_author: string;
+    testimonial_role: string;
+    gallery: number[];
+  };
+}
+
+// Team Member CPT
+export interface TeamMember extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  featured_media: number;
+  meta: Record<string, unknown>;
+  acf: {
+    role: string;
+    bio: string;
+    sort_order: number;
+  };
+}
+
+// Project Category taxonomy
+export interface ProjectCategory {
+  id: number;
+  count: number;
+  description: string;
+  link: string;
+  name: string;
+  slug: string;
+  taxonomy: 'project-category';
+  parent: number;
+  meta: Record<string, unknown>;
+}

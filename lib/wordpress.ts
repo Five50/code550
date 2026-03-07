@@ -17,6 +17,10 @@ import type {
   MenuItem,
   MenuLocation,
   WordPressTemplate,
+  Service,
+  CaseStudy,
+  TeamMember,
+  ProjectCategory,
 } from "./wordpress.d";
 
 const baseUrl = process.env.WORDPRESS_URL;
@@ -1339,6 +1343,120 @@ export function sanitizeContentUrls(html: string): string {
 
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ==================
+// Services
+// ==================
+
+export async function getAllServices(language?: string): Promise<Service[]> {
+  try {
+    return await wordpressFetch<Service[]>(
+      "/wp-json/wp/v2/service",
+      {
+        per_page: 100,
+        _embed: true,
+        orderby: "menu_order",
+        order: "asc",
+      },
+      language
+    );
+  } catch (error) {
+    console.warn("Failed to fetch services:", error);
+    return [];
+  }
+}
+
+export async function getServiceBySlug(slug: string, language?: string): Promise<Service | null> {
+  try {
+    const services = await wordpressFetch<Service[]>(
+      "/wp-json/wp/v2/service",
+      {
+        slug,
+        _embed: true,
+      },
+      language
+    );
+    return services && services.length > 0 ? services[0] : null;
+  } catch (error) {
+    console.warn(`Service "${slug}" not found:`, error);
+    return null;
+  }
+}
+
+// ==================
+// Case Studies
+// ==================
+
+export async function getAllCaseStudies(language?: string): Promise<CaseStudy[]> {
+  try {
+    return await wordpressFetch<CaseStudy[]>(
+      "/wp-json/wp/v2/case-study",
+      {
+        per_page: 100,
+        _embed: true,
+        orderby: "date",
+        order: "desc",
+      },
+      language
+    );
+  } catch (error) {
+    console.warn("Failed to fetch case studies:", error);
+    return [];
+  }
+}
+
+export async function getCaseStudyBySlug(slug: string, language?: string): Promise<CaseStudy | null> {
+  try {
+    const caseStudies = await wordpressFetch<CaseStudy[]>(
+      "/wp-json/wp/v2/case-study",
+      {
+        slug,
+        _embed: true,
+      },
+      language
+    );
+    return caseStudies && caseStudies.length > 0 ? caseStudies[0] : null;
+  } catch (error) {
+    console.warn(`Case study "${slug}" not found:`, error);
+    return null;
+  }
+}
+
+export async function getProjectCategories(): Promise<ProjectCategory[]> {
+  try {
+    return await wordpressFetch<ProjectCategory[]>(
+      "/wp-json/wp/v2/project-category",
+      {
+        per_page: 100,
+      }
+    );
+  } catch (error) {
+    console.warn("Failed to fetch project categories:", error);
+    return [];
+  }
+}
+
+// ==================
+// Team Members
+// ==================
+
+export async function getAllTeamMembers(language?: string): Promise<TeamMember[]> {
+  try {
+    return await wordpressFetch<TeamMember[]>(
+      "/wp-json/wp/v2/team-member",
+      {
+        per_page: 100,
+        _embed: true,
+        orderby: "menu_order",
+        order: "asc",
+      },
+      language
+    );
+  } catch (error) {
+    console.warn("Failed to fetch team members:", error);
+    return [];
+  }
 }
 
 export { WordPressAPIError };
