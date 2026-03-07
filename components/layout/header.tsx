@@ -1,294 +1,338 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Moon, Sun, Menu, X, ArrowRight, Code2, Palette, BarChart3, Layers, MessageSquare, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TransitionLink } from "@/components/ui/transition-link";
-import { useHeader } from "@/lib/header-context";
-import { navigationMenu, type NavigationMenuItem } from "@/menu.config";
-import { siteConfig } from "@/site.config";
-import { cn } from "@/lib/utils";
-import { MenuItem } from "@/lib/wordpress.d";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { ChevronDown, Menu } from "lucide-react";
-import Image from "next/image";
-
-import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/components/theme-provider";
+import { useEffect, useState } from "react";
 
 interface HeaderProps {
-  className?: string;
-  navigationItems?: MenuItem[];
+  onContactClick?: () => void;
 }
 
-export function Header({ className, navigationItems = [] }: HeaderProps) {
-  const { isFixedPosition } = useHeader();
+export function Header({ onContactClick }: HeaderProps) {
+  const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
-  // Use WordPress navigation if available, otherwise fall back to static config
-  const useWordPressNav = navigationItems && navigationItems.length > 0;
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Work", path: "/work" },
+    { name: "About", path: "/about" },
+    { name: "Blog", path: "/blog" },
+  ];
+
+  const services = [
+    {
+      icon: Code2,
+      name: "WordPress Development",
+      description: "Custom themes, plugins, and WooCommerce solutions",
+      stats: "50+ Projects",
+      href: "/services#wordpress"
+    },
+    {
+      icon: Layers,
+      name: "Next.js / React",
+      description: "Modern web applications with React and Next.js",
+      stats: "35+ Apps",
+      href: "/services#react"
+    },
+    {
+      icon: BarChart3,
+      name: "SEO & Performance",
+      description: "Technical SEO, speed optimization, and analytics",
+      stats: "2.5x Avg. Speed",
+      href: "/services#seo"
+    },
+    {
+      icon: Palette,
+      name: "UI/UX Design",
+      description: "User-centered design and interface development",
+      stats: "100+ Designs",
+      href: "/services#design"
+    },
+  ];
 
   return (
     <>
-      <header
-        className={cn(
-          "sticky top-0 z-[100] py-4 px-4 xl:px-0 bg-white dark:bg-slate-900 backdrop-blur-[5px] shadow-xs shadow-blue-500/10 transition-all",
-          className
-        )}
-        style={{ viewTransitionName: 'header' }}
-        role="banner"
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-background/80 backdrop-blur-xl border-b border-border/50"
+            : "bg-transparent"
+        }`}
       >
-        <div className="w-full max-w-5xl mx-auto flex items-center justify-between">
-          {/* Site Logo and Mobile Menu Button */}
-          <div className="flex items-center gap-4">
-            <TransitionLink
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link
               href="/"
-              className="hover:opacity-75 transition-opacity flex items-center gap-3"
-              aria-label={`${siteConfig.site_name} homepage`}
+              className="flex items-center gap-2 group relative z-10"
             >
-              <Image
-                src="/logo-light.svg"
-                alt={siteConfig.site_name}
-                width={120}
-                height={29}
-                className="hidden dark:block"
-                priority
-              />
-              <Image
-                src="/logo-dark.svg"
-                alt={siteConfig.site_name}
-                width={120}
-                height={29}
-                className="dark:hidden block"
-                priority
-              />
-            </TransitionLink>
+              <div className="relative">
+                <div className="absolute inset-0 glow-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+                <img src="/images/code550-logo.png" alt="Code550" className="h-5 md:h-6 lg:h-7 relative z-10 transition-transform duration-300 group-hover:scale-105" />
+              </div>
+            </Link>
 
-            {/* Mobile Menu Button - Visible only on Mobile */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="lg:hidden text-slate-400 hover:text-white"
-                  aria-label="Open navigation menu"
+            {/* Center Navigation - Desktop */}
+            <div className="hidden lg:flex items-center gap-1">
+              {/* Services with Mega Menu */}
+              <div
+                className="relative group"
+                onMouseEnter={() => setServicesMenuOpen(true)}
+                onMouseLeave={() => setServicesMenuOpen(false)}
+              >
+                <button
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm relative ${
+                    pathname === "/services"
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-card/30"
+                  }`}
                 >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-slate-900 border-slate-800">
-                <SheetHeader>
-                  <SheetTitle className="text-left text-white">Navigation</SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col space-y-1 mt-6" role="navigation" aria-label="Mobile navigation">
-                  {useWordPressNav ? (
-                    // WordPress menu items for mobile
-                    navigationItems.map((item) => {
-                      if (item.children && item.children.length > 0) {
-                        return (
-                          <div key={item.id} className="space-y-1">
-                            <div className="text-sm font-medium px-3 py-2 text-slate-300">
-                              {item.title}
-                            </div>
-                            <div className="pl-4 space-y-1">
-                              {item.children.map((child) => (
-                                <TransitionLink
-                                  key={child.id}
-                                  href={child.url}
-                                  className="block text-sm px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                                  target={child.target || undefined}
-                                  onClick={() => setMobileMenuOpen(false)}
-                                >
-                                  {child.title}
-                                </TransitionLink>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                      return (
-                        <TransitionLink
-                          key={item.id}
-                          href={item.url}
-                          className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                          target={item.target || undefined}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {item.title}
-                        </TransitionLink>
-                      );
-                    })
-                  ) : (
-                    // Static config menu items for mobile
-                    Object.entries(navigationMenu).map(([key, item]) => {
-                      if ('items' in item) {
-                        return (
-                          <div key={key} className="space-y-1">
-                            <div className="text-sm font-medium px-3 py-2 text-slate-300">
-                              {item.title}
-                            </div>
-                            <div className="pl-4 space-y-1">
-                              {Object.entries(item.items).map(([label, href]) => (
-                                <TransitionLink
-                                  key={href}
-                                  href={href}
-                                  className="block text-sm px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                                  onClick={() => setMobileMenuOpen(false)}
-                                >
-                                  {label}
-                                </TransitionLink>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      } else if ('href' in item) {
-                        return (
-                          <TransitionLink
-                            key={key}
-                            href={item.href}
-                            className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            {item.title}
-                          </TransitionLink>
-                        );
-                      }
-                      return null;
-                    })
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+                  Services
+                  {/* Hover underline indicator */}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-8" />
+                </button>
 
-            {/* Desktop Navigation - Hidden on Mobile */}
-            <nav className="hidden lg:flex items-center space-x-1" role="navigation" aria-label="Main navigation">
-            {useWordPressNav ? (
-              // Render WordPress menu items
-              navigationItems.map((item) => {
-                // Check if item has children (dropdown)
-                if (item.children && item.children.length > 0) {
-                  return (
-                    <DropdownMenu key={item.id}>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="text-sm font-medium flex items-center gap-1 h-auto px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
-                        >
-                          {item.title}
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-48 bg-slate-900 border-slate-800">
-                        {item.children.map((child) => (
-                          <DropdownMenuItem key={child.id} asChild>
-                            <TransitionLink
-                              href={child.url}
-                              className="w-full flex items-center px-2 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 cursor-pointer"
-                              target={child.target || undefined}
+                {/* Mega Menu Dropdown */}
+                {servicesMenuOpen && (
+                  <div
+                    className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-screen max-w-4xl"
+                    onMouseEnter={() => setServicesMenuOpen(true)}
+                    onMouseLeave={() => setServicesMenuOpen(false)}
+                  >
+                    <div className="p-6 rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl">
+                      <div className="grid grid-cols-2 gap-4">
+                        {services.map((service, index) => {
+                          const Icon = service.icon;
+                          return (
+                            <Link
+                              key={index}
+                              href={service.href}
+                              className="group/item p-4 rounded-xl hover:bg-card/50 transition-all duration-200"
                             >
-                              {child.title}
-                            </TransitionLink>
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  );
-                }
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/10 group-hover/item:bg-primary/20 transition-colors">
+                                  <Icon className="w-5 h-5 text-primary group-hover/item:scale-110 transition-transform" />
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h3 className="font-medium text-sm group-hover/item:text-primary transition-colors">
+                                      {service.name}
+                                    </h3>
+                                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all" />
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mb-2">
+                                    {service.description}
+                                  </p>
+                                  <span className="text-xs font-mono text-primary">
+                                    {service.stats}
+                                  </span>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-border/50">
+                        <Link
+                          href="/services"
+                          className="flex items-center justify-center gap-2 text-sm text-primary hover:gap-3 transition-all"
+                        >
+                          View All Services
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                // Simple link without dropdown
-                return (
-                  <TransitionLink
-                    key={item.id}
-                    href={item.url}
-                    className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                    target={item.target || undefined}
-                  >
-                    {item.title}
-                  </TransitionLink>
-                );
-              })
-            ) : (
-              // Fallback to static config menu
-              Object.entries(navigationMenu).map(([key, item]) => {
-              if ('items' in item) {
-                return (
-                  <DropdownMenu key={key}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="text-sm font-medium flex items-center gap-1 h-auto px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
-                      >
-                        {item.title}
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48 bg-slate-900 border-slate-800">
-                      {Object.entries(item.items).map(([label, href]) => (
-                        <DropdownMenuItem key={href} asChild>
-                          <TransitionLink
-                            href={href}
-                            className="w-full flex items-center px-2 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 cursor-pointer"
-                          >
-                            {label}
-                          </TransitionLink>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                );
-              } else if ('href' in item) {
-                // Simple link without dropdown
-                return (
-                  <TransitionLink
-                    key={key}
-                    href={item.href}
-                    className="text-sm font-medium px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-md transition-colors"
-                  >
-                    {item.title}
-                  </TransitionLink>
-                );
-              }
-              return null;
-            })
-            )}
-            </nav>
-          </div>
+              {/* Other Nav Links */}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm relative group ${
+                    pathname === link.path
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-card/30"
+                  }`}
+                >
+                  {link.name}
+                  {/* Hover underline indicator */}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-8" />
+                </Link>
+              ))}
+            </div>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
-            {/* Call-to-Action Buttons */}
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="hidden sm:flex text-sm font-medium text-slate-400 border border-blue-600/10 transition-colors"
-            >
-              <TransitionLink href="/signin">
-                Sign In
-              </TransitionLink>
-            </Button>
-            <Button
-              size="sm"
-              asChild
-              className="text-xs sm:text-sm px-2 sm:px-3"
-            >
-              <TransitionLink href="/book-a-demo" aria-label="Book a Demo">
-                <span className="hidden sm:inline">Book a Demo</span>
-                <span className="sm:hidden">Demo</span>
-              </TransitionLink>
-            </Button>
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-3">
+              {/* Theme Toggle - Redesigned Compact */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="hidden md:flex items-center justify-center p-2 rounded-lg bg-card/30 border border-border/50 hover:bg-card/50 hover:border-primary/30 transition-all group"
+                aria-label="Toggle theme"
+              >
+                <Sun className="h-4 w-4 text-muted-foreground rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 group-hover:text-primary" />
+                <Moon className="absolute h-4 w-4 text-muted-foreground rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 group-hover:text-primary" />
+              </button>
+
+              {/* Contact Button - Desktop */}
+              <Button
+                size="sm"
+                onClick={onContactClick}
+                className="hidden lg:flex items-center gap-2 text-sm px-6"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Let&apos;s Talk
+              </Button>
+
+              {/* Mobile Menu Button */}
+              <button
+                className="lg:hidden p-2 rounded-lg hover:bg-card/50 transition-colors"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </header>
+      </nav>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative h-full pt-20 px-4 pb-4 overflow-y-auto">
+            <div className="flex flex-col gap-2">
+              {/* Mobile Services Accordion */}
+              <div className="mb-2">
+                <button
+                  onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all text-sm ${
+                    pathname === "/services"
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+                  }`}
+                >
+                  <span className="font-medium">Services</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      mobileServicesOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Accordion Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    mobileServicesOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <div className="space-y-1 pl-2">
+                    {services.map((service, index) => {
+                      const Icon = service.icon;
+                      return (
+                        <Link
+                          key={index}
+                          href={service.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-card/50 transition-colors"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Icon className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">{service.name}</div>
+                            <div className="text-xs text-muted-foreground">{service.stats}</div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                    <Link
+                      href="/services"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 p-3 text-sm text-primary hover:bg-primary/10 rounded-lg transition-all"
+                    >
+                      View All Services
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Nav Links */}
+              <div className="border-t border-border/50 pt-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    href={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-4 py-3 rounded-lg transition-all text-sm ${
+                      pathname === link.path
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Mobile Contact Button */}
+              <div className="mt-6 px-4">
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onContactClick?.();
+                  }}
+                  className="w-full text-sm"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Let&apos;s Talk
+                </Button>
+              </div>
+
+              {/* Mobile Theme Toggle */}
+              <div className="flex items-center justify-between px-4 py-3 mt-4 rounded-lg bg-card/50 border border-border/50">
+                <span className="text-sm text-muted-foreground">Dark Mode</span>
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-muted-foreground" />
+                  <Switch
+                    checked={theme === "dark"}
+                    onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <Moon className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

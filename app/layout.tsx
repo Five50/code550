@@ -77,7 +77,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <TemplateUpdater initialTemplate={template} />
           <HeaderProvider>
-            {!isProductionDomain && <Header navigationItems={navigationItems} />}
+            {!isProductionDomain && <Header />}
             {children}
             {!isProductionDomain && <Footer />}
           </HeaderProvider>
