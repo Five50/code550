@@ -1,11 +1,13 @@
 import "../styles/input.css";
 
 import { Analytics } from "@vercel/analytics/react";
-import { Header } from "@/components/layout/header";
+import { HeaderWithContact } from "@/components/layout/header-with-contact";
 import { Footer } from "@/components/layout/footer";
 import { HeaderProvider } from "@/lib/header-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TemplateUpdater } from "@/components/template-updater";
+import { ContactModalProvider } from "@/lib/contact-modal-context";
+import { ContactModal } from "@/components/contact-modal";
 import { getPrimaryNavigation, getGlobalStyles, getTemplateForPath } from "@/lib/wordpress";
 import { headers } from "next/headers";
 
@@ -75,12 +77,15 @@ export default async function RootLayout({
         data-template={template}
       >
         <ThemeProvider>
-          <TemplateUpdater initialTemplate={template} />
-          <HeaderProvider>
-            {!isProductionDomain && <Header />}
-            {children}
-            {!isProductionDomain && <Footer />}
-          </HeaderProvider>
+          <ContactModalProvider>
+            <TemplateUpdater initialTemplate={template} />
+            <HeaderProvider>
+              {!isProductionDomain && <HeaderWithContact />}
+              {children}
+              {!isProductionDomain && <Footer />}
+            </HeaderProvider>
+            <ContactModal />
+          </ContactModalProvider>
         </ThemeProvider>
         <Analytics />
       </body>
