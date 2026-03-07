@@ -59,9 +59,9 @@ const supportedLanguages = ["en"] as const;
 
 export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
   // Identity
-  site_name: "My Site",
-  site_description: "A Next.js + headless WordPress starter template",
-  site_domain: "https://example.com",
+  site_name: "Code550",
+  site_description: "We craft high-performance websites and applications that drive measurable results.",
+  site_domain: "https://code550.com",
 
   // Language
   defaultLanguage: "en",
@@ -72,16 +72,16 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
 
   // Typography
   fonts: {
-    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-    heading: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-    mono: ["ui-monospace", "SFMono-Regular", "monospace"],
+    sans: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+    heading: ["Syne", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
   },
 
   // Theme
   darkMode: true,
 
   // WordPress plugin namespace
-  wpPluginNamespace: "starter-wp",
+  wpPluginNamespace: "code550-wp",
 
   // Fallback homepage
   fallbackHomepage: {
@@ -93,10 +93,10 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
   },
 
   // Footer
-  footerDescription: "A modern headless WordPress site powered by Next.js.",
+  footerDescription: "We craft high-performance websites and applications that drive measurable results. From strategy to deployment, we're your technical partner for growth.",
 
   // Copyright
-  copyrightHolder: "My Site",
+  copyrightHolder: "Code550",
 };
 
 // Derived types for consumers

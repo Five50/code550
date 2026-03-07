@@ -14,6 +14,7 @@ export default {
       fontFamily: {
         sans: siteConfig.fonts.sans,
         heading: siteConfig.fonts.heading,
+        display: siteConfig.fonts.heading,
         mono: siteConfig.fonts.mono,
       },
     },
