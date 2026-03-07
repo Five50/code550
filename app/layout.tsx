@@ -7,7 +7,6 @@ import { HeaderProvider } from "@/lib/header-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TemplateUpdater } from "@/components/template-updater";
 import { getPrimaryNavigation, getGlobalStyles, getTemplateForPath } from "@/lib/wordpress";
-import Script from "next/script";
 import { headers } from "next/headers";
 
 import { siteConfig } from "@/site.config";
@@ -71,7 +70,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen font-sans antialiased text-slate-400 bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950"
+          "min-h-screen font-sans antialiased"
         )}
         data-template={template}
       >
@@ -84,19 +83,6 @@ export default async function RootLayout({
           </HeaderProvider>
         </ThemeProvider>
         <Analytics />
-
-        {/* Alpine.js */}
-        <Script
-          src="/js/alpine.min.js"
-          strategy="beforeInteractive"
-          defer
-        />
-
-        {/* GSAP */}
-        <Script
-          src="/js/gsap.min.js"
-          strategy="beforeInteractive"
-        />
       </body>
     </html>
   );
