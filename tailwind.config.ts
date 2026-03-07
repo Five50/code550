@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss'
-import { siteConfig } from './site.config'
 
 export default {
   darkMode: 'class',
@@ -9,14 +8,4 @@ export default {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './lib/**/*.{js,ts,jsx,tsx}',
   ],
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: siteConfig.fonts.sans,
-        heading: siteConfig.fonts.heading,
-        display: siteConfig.fonts.heading,
-        mono: siteConfig.fonts.mono,
-      },
-    },
-  },
 } satisfies Config
