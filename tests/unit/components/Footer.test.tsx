@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Footer } from '@/components/layout/footer';
-import { siteConfig } from '@/site.config';
 
 // Mock next/image
 vi.mock('next/image', () => ({
@@ -13,9 +12,23 @@ vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: any) => <a href={href} {...props}>{children}</a>,
 }));
 
-// Mock LanguageSwitcher
-vi.mock('@/components/language-switcher', () => ({
-  LanguageSwitcher: () => <div data-testid="language-switcher">Language Switcher</div>,
+// Mock motion/react
+vi.mock('motion/react', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => {
+      const { initial, whileInView, viewport, ...rest } = props;
+      return <div {...rest}>{children}</div>;
+    },
+  },
+}));
+
+// Mock Select component
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ children }: any) => <div>{children}</div>,
+  SelectContent: ({ children }: any) => <div>{children}</div>,
+  SelectItem: ({ children }: any) => <div>{children}</div>,
+  SelectTrigger: ({ children }: any) => <button>{children}</button>,
+  SelectValue: () => <span>English</span>,
 }));
 
 describe('Footer Component', () => {
@@ -24,52 +37,45 @@ describe('Footer Component', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 
-  it('displays the copyright holder from siteConfig', () => {
+  it('displays the copyright text', () => {
     render(<Footer />);
-    expect(screen.getByText(siteConfig.copyrightHolder)).toBeInTheDocument();
-  });
-
-  it('displays the current year in copyright', () => {
-    render(<Footer />);
-    const currentYear = new Date().getFullYear().toString();
     const footer = screen.getByRole('contentinfo');
-    expect(footer.textContent).toContain(currentYear);
+    expect(footer.textContent).toContain('Code550');
+    expect(footer.textContent).toContain(new Date().getFullYear().toString());
   });
 
-  it('displays the footer description from siteConfig', () => {
+  it('renders service navigation links', () => {
     render(<Footer />);
-    expect(screen.getByText(siteConfig.footerDescription)).toBeInTheDocument();
+    expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getByText('WordPress Development')).toBeInTheDocument();
   });
 
-  it('renders logo images with site_name as alt text', () => {
+  it('renders company navigation links', () => {
     render(<Footer />);
-    const logos = screen.getAllByAltText(siteConfig.site_name);
-    expect(logos.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders footer navigation sections', () => {
-    render(<Footer />);
-    // Check for the navigation section titles
-    expect(screen.getByText('Pages')).toBeInTheDocument();
-    expect(screen.getByText('Content')).toBeInTheDocument();
-  });
-
-  it('renders navigation links', () => {
-    render(<Footer />);
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Company')).toBeInTheDocument();
+    expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Blog')).toBeInTheDocument();
-    expect(screen.getByText('Categories')).toBeInTheDocument();
+    expect(screen.getAllByText('Contact').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('does not render LanguageSwitcher when only one language is supported', () => {
+  it('renders legal links', () => {
     render(<Footer />);
-    if (siteConfig.supportedLanguages.length <= 1) {
-      expect(screen.queryByTestId('language-switcher')).not.toBeInTheDocument();
-    }
+    expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
+    expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+    expect(screen.getByText('Cookie Policy')).toBeInTheDocument();
   });
 
-  it('applies custom className', () => {
-    render(<Footer className="custom-footer" />);
-    expect(screen.getByRole('contentinfo')).toHaveClass('custom-footer');
+  it('renders social link aria labels', () => {
+    render(<Footer />);
+    expect(screen.getByLabelText('Twitter')).toBeInTheDocument();
+    expect(screen.getByLabelText('GitHub')).toBeInTheDocument();
+    expect(screen.getByLabelText('LinkedIn')).toBeInTheDocument();
+  });
+
+  it('renders the newsletter section', () => {
+    render(<Footer />);
+    expect(screen.getByText('Stay in the Loop')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('your@email.com')).toBeInTheDocument();
+    expect(screen.getByText('Subscribe')).toBeInTheDocument();
   });
 });

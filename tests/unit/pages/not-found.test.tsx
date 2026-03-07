@@ -9,17 +9,17 @@ vi.mock('next/link', () => ({
 describe('NotFound page', () => {
   it('renders 404 heading', () => {
     render(<NotFound />);
-    expect(screen.getByText('404 - Page Not Found')).toBeInTheDocument();
+    expect(screen.getByText('404')).toBeInTheDocument();
   });
 
   it('renders descriptive message', () => {
     render(<NotFound />);
-    expect(screen.getByText(/Sorry, the page you are looking for does not exist/)).toBeInTheDocument();
+    expect(screen.getByText(/The page you are looking for/)).toBeInTheDocument();
   });
 
-  it('renders "Return Home" link', () => {
+  it('renders "Go Home" link', () => {
     render(<NotFound />);
-    const link = screen.getByText('Return Home');
+    const link = screen.getByText('Go Home');
     expect(link.closest('a')).toHaveAttribute('href', '/');
   });
 });

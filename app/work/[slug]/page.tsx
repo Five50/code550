@@ -4,8 +4,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
-  const caseStudies = await getAllCaseStudies();
-  return caseStudies.map((cs) => ({ slug: cs.slug }));
+  try {
+    const caseStudies = await getAllCaseStudies();
+    return caseStudies.map((cs) => ({ slug: cs.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

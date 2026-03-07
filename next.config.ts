@@ -26,10 +26,12 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
+    const wpUrl = process.env.WORDPRESS_URL;
+    if (!wpUrl) return [];
     return [
       {
         source: "/media/:path*",
-        destination: `${process.env.WORDPRESS_URL}/wp-content/uploads/:path*`,
+        destination: `${wpUrl}/wp-content/uploads/:path*`,
       },
     ];
   },

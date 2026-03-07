@@ -10,47 +10,53 @@ vi.mock('@/lib/wordpress', () => ({
   ]),
 }));
 
+vi.mock('@/proxy', () => ({
+  supportedLanguages: ['en'],
+}));
+
 import sitemap from '@/app/sitemap';
+
+const DOMAIN = 'https://code550.com';
 
 describe('sitemap', () => {
   it('returns static URLs', async () => {
     const result = await sitemap();
     const urls = result.map(entry => entry.url);
-    expect(urls).toContain('https://example.com');
-    expect(urls).toContain('https://example.com/posts/archive');
-    expect(urls).toContain('https://example.com/posts/categories');
-    expect(urls).toContain('https://example.com/posts/authors');
-    expect(urls).toContain('https://example.com/posts/tags');
+    expect(urls).toContain(`${DOMAIN}`);
+    expect(urls).toContain(`${DOMAIN}/posts/archive`);
+    expect(urls).toContain(`${DOMAIN}/posts/categories`);
+    expect(urls).toContain(`${DOMAIN}/posts/authors`);
+    expect(urls).toContain(`${DOMAIN}/posts/tags`);
   });
 
   it('generates post URLs from WordPress data', async () => {
     const result = await sitemap();
     const urls = result.map(entry => entry.url);
-    expect(urls).toContain('https://example.com/hello-world');
-    expect(urls).toContain('https://example.com/second-post');
+    expect(urls).toContain(`${DOMAIN}/hello-world`);
+    expect(urls).toContain(`${DOMAIN}/second-post`);
   });
 
   it('generates page URLs from WordPress data', async () => {
     const result = await sitemap();
     const urls = result.map(entry => entry.url);
-    expect(urls).toContain('https://example.com/about');
+    expect(urls).toContain(`${DOMAIN}/about`);
   });
 
   it('sets correct priorities', async () => {
     const result = await sitemap();
-    const homepage = result.find(e => e.url === 'https://example.com');
+    const homepage = result.find(e => e.url === `${DOMAIN}`);
     expect(homepage?.priority).toBe(1);
 
-    const postEntry = result.find(e => e.url === 'https://example.com/hello-world');
+    const postEntry = result.find(e => e.url === `${DOMAIN}/hello-world`);
     expect(postEntry?.priority).toBe(0.7);
 
-    const pageEntry = result.find(e => e.url === 'https://example.com/about');
+    const pageEntry = result.find(e => e.url === `${DOMAIN}/about`);
     expect(pageEntry?.priority).toBe(0.6);
   });
 
   it('includes lastModified dates for posts', async () => {
     const result = await sitemap();
-    const postEntry = result.find(e => e.url === 'https://example.com/hello-world');
+    const postEntry = result.find(e => e.url === `${DOMAIN}/hello-world`);
     expect(postEntry?.lastModified).toBeDefined();
   });
 });

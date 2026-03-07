@@ -4,8 +4,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
-  const services = await getAllServices();
-  return services.map((s) => ({ slug: s.slug }));
+  try {
+    const services = await getAllServices();
+    return services.map((s) => ({ slug: s.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
