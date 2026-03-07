@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { WPContent } from "@/lib/wp-content-renderer";
 import { Clock, User, Calendar } from "lucide-react";
 import { motion } from "motion/react";
 import type { Post, Author, Category } from "@/lib/wordpress.d";
@@ -98,8 +99,9 @@ export function BlogPostPage({ post, relatedPosts, author, category }: BlogPostP
             </div>
           )}
 
-          {/* Content - WordPress CMS content (trusted source) */}
-          <div
+          {/* Content - WordPress CMS content with class transformation */}
+          <WPContent
+            html={post.content.rendered}
             className="prose prose-invert max-w-none
               prose-headings:font-[family-name:var(--font-display)]
               prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
@@ -108,7 +110,6 @@ export function BlogPostPage({ post, relatedPosts, author, category }: BlogPostP
               prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
               prose-ul:my-6 prose-li:text-muted-foreground prose-li:mb-2
               prose-strong:text-foreground"
-            dangerouslySetInnerHTML={{ __html: post.content.rendered }}
           />
         </motion.div>
       </article>

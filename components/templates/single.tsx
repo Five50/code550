@@ -1,7 +1,7 @@
 'use client';
 
 import { Article } from "@/components/craft";
-import parse from "html-react-parser";
+import { WPContent } from "@/lib/wp-content-renderer";
 import Image from "next/image";
 import { ViewTransitionLink } from "@/components/view-transition-link";
 import { useGsapFadeIn, useGsapSlideIn } from "@/lib/use-gsap";
@@ -99,7 +99,7 @@ export function SingleTemplate({ post, styles }: SingleTemplateProps) {
           {/* Post Content - Prose Style */}
           <div ref={contentRef}>
             <Article className="prose prose-lg dark:prose-invert max-w-none view-transition-content">
-              {parse(post.content.rendered)}
+              <WPContent html={post.content.rendered} />
             </Article>
           </div>
 

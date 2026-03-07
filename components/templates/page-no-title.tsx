@@ -1,5 +1,5 @@
 import { Section, Article } from "@/components/craft";
-import parse from "html-react-parser";
+import { WPContent } from "@/lib/wp-content-renderer";
 
 interface PageNoTitleTemplateProps {
   page: any;
@@ -20,7 +20,7 @@ export function PageNoTitleTemplate({ page, styles }: PageNoTitleTemplateProps) 
       {styles && <style dangerouslySetInnerHTML={{ __html: styles }} />}
       <Section>
         {/* Page Content - No Title */}
-        <Article>{parse(page.content.rendered)}</Article>
+        <Article><WPContent html={page.content.rendered} /></Article>
       </Section>
     </>
   );

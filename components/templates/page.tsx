@@ -1,5 +1,5 @@
 import { Section, Article } from "@/components/craft";
-import parse from "html-react-parser";
+import { WPContent } from "@/lib/wp-content-renderer";
 
 interface PageTemplateProps {
   page: any;
@@ -20,7 +20,7 @@ export function PageTemplate({ page, styles }: PageTemplateProps) {
       {styles && <style dangerouslySetInnerHTML={{ __html: styles }} />}
       <Section>
         {/* Page Content */}
-        <Article>{parse(page.content.rendered)}</Article>
+        <Article><WPContent html={page.content.rendered} /></Article>
       </Section>
     </>
   );

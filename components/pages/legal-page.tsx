@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { WPContent } from "@/lib/wp-content-renderer";
 
 interface LegalPageProps {
   title: string;
@@ -178,9 +179,9 @@ export function LegalPage({ title, lastUpdated, content, breadcrumbLabel }: Lega
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto prose prose-invert">
               <div className="space-y-12">
-                <div
+                <WPContent
+                  html={displayContent}
                   className="[&>h2]:font-[family-name:var(--font-display)] [&>h2]:text-3xl [&>h2]:mb-4 [&>h3]:font-[family-name:var(--font-display)] [&>h3]:text-xl [&>h3]:mb-3 [&>h3]:mt-6 [&>p]:text-muted-foreground [&>p]:leading-relaxed [&>p]:mt-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ul]:text-muted-foreground [&>ul]:ml-4 [&>ul]:mt-4"
-                  dangerouslySetInnerHTML={{ __html: displayContent }}
                 />
 
                 {/* Contact Box */}
