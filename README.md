@@ -536,7 +536,7 @@ The sitemap is generated at `@/app/sitemap.ts` and will appear live on your site
 
 ## Revalidation Setup
 
-Content changes in WordPress push to Next.js via the [NextPulse](https://www.code550.com/nextpulse) plugin. Next.js does not poll; pages revalidate on a 1-hour TTL as a floor and immediately on a pulse.
+Content changes in WordPress push to Next.js via the [NextPulse](https://www.code550.com/nextpulse) plugin. For end-to-end setup of both sides, see [docs/nextpulse-integration.md](./docs/nextpulse-integration.md). Next.js does not poll; pages revalidate on a 1-hour TTL as a floor and immediately on a pulse.
 
 ### Cache Tags
 
