@@ -1,12 +1,12 @@
-# AltoFuel
+# Code550
 
-AltoFuel is a modern headless WordPress application built with Next.js 15 and Tailwind CSS 4.1. It provides a clean, fast, and SEO-optimized front-end for WordPress content management.
+Code550 is a headless WordPress site built with Next.js 16 and Tailwind CSS 4.1. WordPress is the CMS; this app renders the content with a clean, fast, SEO-optimized front-end.
 
-AltoFuel is built with [Next.js 15](https://nextjs.org/docs), [React](https://react.dev/), [Typescript](https://www.typescriptlang.org/docs/), [Tailwind CSS 4.1](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/docs), and [brijr/craft](https://github.com/brijr/craft).
+Built with [Next.js 16](https://nextjs.org/docs), [React 19](https://react.dev/), [Typescript](https://www.typescriptlang.org/docs/), [Tailwind CSS 4.1](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/docs), and [brijr/craft](https://github.com/brijr/craft).
 
 ## Table of Contents
 
-- [AltoFuel](#altofuel)
+- [Code550](#code550)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [WordPress Functions](#wordpress-functions)
@@ -67,7 +67,7 @@ You can find the example of `.env.local` file in the `.env.example` file (and in
 
 ## WordPress Functions
 
-The `lib/wordpress.ts` file contains a comprehensive set of functions for interacting with the WordPress REST API. Each function is optimized for Next.js 15's caching system and includes proper error handling.
+The `lib/wordpress.ts` file contains a comprehensive set of functions for interacting with the WordPress REST API. Each function is optimized for Next.js 16's caching system and includes proper error handling.
 
 ### Core Functionality
 
@@ -145,7 +145,7 @@ class WordPressAPIError extends Error {
 
 ### Cache Management
 
-Each function supports Next.js 15's cache tags for efficient revalidation:
+Each function supports Next.js 16's cache tags for efficient revalidation:
 
 ```typescript
 // Example cache configuration
@@ -176,7 +176,7 @@ try {
 }
 ```
 
-These functions are designed to work seamlessly with Next.js 15's App Router and provide proper TypeScript support through the types defined in `wordpress.d.ts`.
+These functions are designed to work seamlessly with Next.js 16's App Router and provide proper TypeScript support through the types defined in `wordpress.d.ts`.
 
 ## Pagination System
 
@@ -532,103 +532,75 @@ Each OG image includes:
 
 ## Dynamic Sitemap
 
-The sitemap for `next-wp` is generated at `@/app/sitemap.ts` and will appear live on your site at `yourdomain.com/sitemap.xml`. In order to set up your sitemap correctly please make sure to update the `site_domain` in the `site.config.ts` to be the domain of your frontend (not your WordPress instance).
+The sitemap is generated at `@/app/sitemap.ts` and will appear live on your site at `yourdomain.com/sitemap.xml`. In order to set up your sitemap correctly please make sure to update the `site_domain` in the `site.config.ts` to be the domain of your frontend (not your WordPress instance).
 
 ## Revalidation Setup
 
-This starter implements an intelligent caching and revalidation system using Next.js 15's cache tags. Here's how it works:
+Content changes in WordPress push to Next.js via the [NextPulse](https://www.code550.com/nextpulse) plugin. Next.js does not poll; pages revalidate on a 1-hour TTL as a floor and immediately on a pulse.
 
-### Cache Tags System
+### Cache Tags
 
-The WordPress API functions use a sophisticated hierarchical cache tag system for granular revalidation:
+Every REST fetch in `lib/wordpress.ts` is tagged `wordpress`, so `revalidateTag("wordpress")` invalidates all WordPress-derived data. Two narrower tag families exist on top of that:
 
-#### Global Tags
-- `wordpress` - Affects all WordPress content
+- `lang-{code}` — applied when a request carries a WPML language
+- `posts`, `posts-page-{n}`, `posts-search`, `posts-author-{id}`, `posts-category-{id}`, `posts-tag-{id}` — applied by `getPostsPaginated()` only
 
-#### Content Type Tags
-- `posts` - All post content
-- `categories` - All category content
-- `tags` - All tag content
-- `authors` - All author content
+All of these also carry the `wordpress` tag, so they are subsets, not alternatives. There are no per-item `post-{id}` / `category-{id}` tags.
 
-#### Pagination-Specific Tags
-- `posts-page-1`, `posts-page-2`, etc. - Individual pagination pages
-- `posts-search` - Search result pages
-- `posts-author-123` - Posts filtered by specific author
-- `posts-category-456` - Posts filtered by specific category
-- `posts-tag-789` - Posts filtered by specific tag
+### WordPress Setup (NextPulse)
 
-#### Individual Item Tags
-- `post-123` - Specific post content
-- `category-456` - Specific category content
-- `tag-789` - Specific tag content
-- `author-123` - Specific author content
+1. **Install NextPulse** — upload the release zip via Plugins > Add New > Upload Plugin, activate it.
+2. **Configure** — NextPulse > Settings: set the Next.js site URL and generate a webhook secret (`openssl rand -base64 32`). Leave the revalidation path at `/api/revalidate`.
+3. **Configure Next.js** — put the same secret in `WORDPRESS_WEBHOOK_SECRET`. The route is already wired.
+4. **Verify** — use the plugin's Connection Test, then check NextPulse > History for a 200.
 
-This granular system ensures that when content changes, only the relevant cached data is invalidated, providing optimal performance.
+### Webhook Contract
 
-### Automatic Revalidation
+`POST /api/revalidate` — implemented in `app/api/revalidate/route.ts`.
 
-1. **Install the WordPress Plugin:**
+**Headers:**
 
-   - Navigate to the `/plugin` directory
-   - Use the pre-built `next-revalidate.zip` file or create a ZIP from the `next-revalidate` folder
-   - Install and activate through WordPress admin
-   - Go to Settings > Next.js Revalidation
-   - Configure your Next.js URL and webhook secret
+| Header | Purpose |
+|---|---|
+| `x-webhook-secret` | Must equal `WORDPRESS_WEBHOOK_SECRET` (compared in constant time) |
+| `x-webhook-timestamp` | Unix seconds; rejected outside a 300s window |
+| `x-webhook-signature` | `HMAC-SHA256("{timestamp}.{rawBody}", secret)`, hex |
 
-2. **Configure Next.js:**
+**Body:**
 
-   - Add `WORDPRESS_WEBHOOK_SECRET` to your environment variables (same secret as in WordPress plugin)
-   - The webhook endpoint at `/api/revalidate` is already set up
-   - No additional configuration needed
+```json
+{
+  "contentType": "post|page|term|author|media|menu|custom|all",
+  "contentId": 123,
+  "paths": ["/blog/my-post"]
+}
+```
 
-3. **How it Works:**
-   - When content is updated in WordPress, the plugin sends a webhook
-   - The webhook includes content type and ID information
-   - Next.js intelligently revalidates specific cache tags based on the change:
-     - **Post changes**: Revalidates `posts`, `post-{id}`, and `posts-page-1`
-     - **Category changes**: Revalidates `categories`, `category-{id}`, and `posts-category-{id}`
-     - **Tag changes**: Revalidates `tags`, `tag-{id}`, and `posts-tag-{id}`
-     - **Author changes**: Revalidates `authors`, `author-{id}`, and `posts-author-{id}`
-   - Only affected cached content is updated, maintaining optimal performance
+The handler verifies the signature against the raw request bytes, validates the payload with Zod, then:
 
-### Plugin Features
+- calls `revalidateTag("wordpress", "max")` on every accepted pulse
+- calls `revalidatePath()` for each resolved path in `paths` (capped at 50)
+- falls back to `revalidatePath("/", "layout")` when no paths are sent, or when `contentType` is `menu`, `media`, or `all` — changes that affect site-wide chrome
 
-The Next.js Revalidation plugin includes:
-
-- Automatic revalidation when posts, pages, categories, tags, authors, or media are modified
-- Settings page to configure your Next.js site URL and webhook secret
-- Manual revalidation option for full site refresh
-- Support for custom post types and taxonomies
-- Optional admin notifications for revalidation events
+Bad secret or signature returns 401; malformed payload returns 400.
 
 ### Manual Revalidation
 
-You can manually revalidate content using Next.js cache functions:
+NextPulse's Tools page can fire a full-site pulse. In code:
 
 ```typescript
 import { revalidateTag } from "next/cache";
 
-// Revalidate all WordPress content
-revalidateTag("wordpress");
+// All WordPress content
+revalidateTag("wordpress", "max");
 
-// Revalidate specific content types
-revalidateTag("posts");
-revalidateTag("categories");
-revalidateTag("tags");
-revalidateTag("authors");
-
-// Revalidate specific items
-revalidateTag("post-123");
-revalidateTag("category-456");
-
-// Revalidate pagination-specific content
-revalidateTag("posts-page-1");
-revalidateTag("posts-category-123");
-revalidateTag("posts-search");
+// Narrower, if you only touched the paginated post list
+revalidateTag("posts", "max");
+revalidateTag("posts-page-1", "max");
+revalidateTag("posts-category-123", "max");
 ```
 
-This system ensures your content stays fresh while maintaining optimal performance through intelligent caching.
+Note that `revalidateTag` in Next.js 16 requires a cache profile as its second argument.
 
 ## AI Assistant Guidelines
 
