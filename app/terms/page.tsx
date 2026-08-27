@@ -3,7 +3,7 @@ import { LegalPage } from "@/components/pages/legal-page";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Code550",
+  title: "Terms of Service",
 };
 
 export default async function Page() {

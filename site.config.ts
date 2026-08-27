@@ -12,6 +12,25 @@ type FontConfig = {
   mono: readonly string[];
 };
 
+type BrandLogo = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+type ContactDetails = {
+  email: string;
+  phone: string | null;
+  location: string | null;
+};
+
+type SocialLinks = {
+  twitter: string | null;
+  github: string | null;
+  linkedin: string | null;
+};
+
 type FallbackHomepage = {
   heading: string;
   description: string;
@@ -25,6 +44,10 @@ type SiteConfig<TLangs extends readonly string[] = readonly string[]> = {
   site_name: string;
   site_description: string;
   site_domain: string;
+  tagline: string;
+  logo: BrandLogo;
+  contact: ContactDetails;
+  social: SocialLinks;
 
   // Language
   defaultLanguage: TLangs[number];
@@ -33,6 +56,9 @@ type SiteConfig<TLangs extends readonly string[] = readonly string[]> = {
 
   // Typography (Tailwind font families)
   fonts: FontConfig;
+
+  // Stylesheet providing the families above. Null if fonts are self-hosted.
+  googleFontsUrl: string | null;
 
   // Theme
   darkMode: boolean;
@@ -62,6 +88,23 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
   site_name: "Code550",
   site_description: "We craft high-performance websites and applications that drive measurable results.",
   site_domain: "https://code550.com",
+  tagline: "Build Digital Products That Convert",
+  logo: {
+    src: "/images/code550-logo.png",
+    alt: "Code550",
+    width: 240,
+    height: 32,
+  },
+  contact: {
+    email: "hello@code550.com",
+    phone: "+1 (555) 123-4567",
+    location: "San Francisco, CA",
+  },
+  social: {
+    twitter: null,
+    github: null,
+    linkedin: null,
+  },
 
   // Language
   defaultLanguage: "en",
@@ -77,6 +120,9 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
     mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
   },
 
+  googleFontsUrl:
+    "https://fonts.googleapis.com/css2?family=Syne:wght@400..800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap",
+
   // Theme
   darkMode: true,
 
@@ -85,11 +131,11 @@ export const siteConfig: Readonly<SiteConfig<typeof supportedLanguages>> = {
 
   // Fallback homepage
   fallbackHomepage: {
-    heading: "Next Generation Alternative Fuel Intelligence",
-    description: "Advanced analytics and insights for the alternative fuel industry. Powered by real-time data and industry expertise.",
-    ctaUrl: "https://app.altofuel.com",
-    ctaLabel: "Access Platform",
-    supportEmail: "info@altofuel.com",
+    heading: "Build Digital Products That Convert",
+    description: "We craft high-performance websites and applications that drive measurable results.",
+    ctaUrl: null,
+    ctaLabel: "Get in Touch",
+    supportEmail: "hello@code550.com",
   },
 
   // Footer

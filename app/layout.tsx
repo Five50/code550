@@ -8,7 +8,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TemplateUpdater } from "@/components/template-updater";
 import { ContactModalProvider } from "@/lib/contact-modal-context";
 import { ContactModal } from "@/components/contact-modal";
-import { getPrimaryNavigation, getGlobalStyles, getTemplateForPath } from "@/lib/wordpress";
+import {
+  getPrimaryNavigation,
+  getFooterNavigation,
+  getGlobalStyles,
+  getTemplateForPath,
+} from "@/lib/wordpress";
 import { headers } from "next/headers";
 
 import { siteConfig } from "@/site.config";
@@ -17,7 +22,10 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: siteConfig.site_name,
+  title: {
+    default: `${siteConfig.site_name} — ${siteConfig.tagline}`,
+    template: `%s — ${siteConfig.site_name}`,
+  },
   description: siteConfig.site_description,
   metadataBase: new URL(siteConfig.site_domain),
   alternates: {
@@ -25,16 +33,30 @@ export const metadata: Metadata = {
   },
 };
 
+/** Quote family names that need it, then emit the CSS custom properties. */
+function toFontStack(families: readonly string[]): string {
+  return families
+    .map((family) => (/\s/.test(family) ? `'${family}'` : family))
+    .join(", ");
+}
+
+const fontVariables = `:root {
+  --site-font-sans: ${toFontStack(siteConfig.fonts.sans)};
+  --site-font-display: ${toFontStack(siteConfig.fonts.heading)};
+  --site-font-mono: ${toFontStack(siteConfig.fonts.mono)};
+}`;
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Fetch navigation menu from WordPress
-  const navigationItems = await getPrimaryNavigation('en');
-
-  // Fetch WordPress global styles to inject before Tailwind
-  const globalStyles = await getGlobalStyles();
+  // Fetch navigation menus and global styles from WordPress in parallel
+  const [primaryNavigation, footerNavigation, globalStyles] = await Promise.all([
+    getPrimaryNavigation(siteConfig.defaultLanguage),
+    getFooterNavigation(siteConfig.defaultLanguage),
+    getGlobalStyles(),
+  ]);
 
   // Get current pathname and determine WordPress template
   const headersList = await headers();
@@ -44,8 +66,28 @@ export default async function RootLayout({
   const isProductionDomain = process.env.VERCEL_ENV === 'production';
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html
+      lang={siteConfig.defaultLanguage}
+      className="dark"
+      suppressHydrationWarning
+    >
       <head>
+        {/* Font families come from site.config.ts so each site ships its own */}
+        {siteConfig.googleFontsUrl && (
+          <>
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link
+              rel="preconnect"
+              href="https://fonts.gstatic.com"
+              crossOrigin="anonymous"
+            />
+            <link rel="stylesheet" href={siteConfig.googleFontsUrl} />
+          </>
+        )}
+        <style
+          id="site-fonts"
+          dangerouslySetInnerHTML={{ __html: fontVariables }}
+        />
         {/* WordPress global styles - injected inline BEFORE Tailwind bundle loads */}
         {globalStyles && (
           <style
@@ -80,9 +122,11 @@ export default async function RootLayout({
           <ContactModalProvider>
             <TemplateUpdater initialTemplate={template} />
             <HeaderProvider>
-              {!isProductionDomain && <HeaderWithContact />}
+              {!isProductionDomain && (
+                <HeaderWithContact navItems={primaryNavigation} />
+              )}
               {children}
-              {!isProductionDomain && <Footer />}
+              {!isProductionDomain && <Footer navItems={footerNavigation} />}
             </HeaderProvider>
             <ContactModal />
           </ContactModalProvider>

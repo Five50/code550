@@ -1,34 +1,66 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Github, Twitter, Linkedin, Mail, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { siteConfig } from "@/site.config";
+import type { MenuItem } from "@/lib/wordpress.d";
 
-export function Footer() {
-  const [language, setLanguage] = useState("en");
-
-  const navigation = {
-    services: [
+/** Shown when WordPress has no menu assigned to the "footer" location. */
+const fallbackColumns = [
+  {
+    title: "Services",
+    links: [
       { name: "WordPress Development", href: "/services#wordpress" },
       { name: "Next.js / React", href: "/services#react" },
       { name: "SEO & Performance", href: "/services#seo" },
       { name: "UI/UX Design", href: "/services#design" },
     ],
-    company: [
+  },
+  {
+    title: "Company",
+    links: [
       { name: "About", href: "/about" },
       { name: "Work", href: "/work" },
       { name: "Blog", href: "/blog" },
       { name: "Contact", href: "/contact" },
     ],
-    social: [
-      { name: "Twitter", icon: Twitter, href: "#" },
-      { name: "GitHub", icon: Github, href: "#" },
-      { name: "LinkedIn", icon: Linkedin, href: "#" },
-      { name: "Email", icon: Mail, href: "mailto:hello@code550.com" },
-    ],
-  };
+  },
+];
+
+/**
+ * WordPress footer menus nest one level: each top-level item becomes a column
+ * heading and its children become the links beneath it.
+ */
+function toColumns(navItems?: MenuItem[]) {
+  const withChildren = navItems?.filter((item) => item.children?.length);
+  if (!withChildren?.length) return fallbackColumns;
+
+  return withChildren.map((item) => ({
+    title: item.title,
+    links: (item.children ?? []).map((child) => ({
+      name: child.title,
+      href: child.url,
+    })),
+  }));
+}
+
+export function Footer({ navItems }: { navItems?: MenuItem[] }) {
+  const [language, setLanguage] = useState<string>(siteConfig.defaultLanguage);
+
+  const columns = toColumns(navItems);
+
+  const social = [
+    { name: "Twitter", icon: Twitter, href: siteConfig.social.twitter },
+    { name: "GitHub", icon: Github, href: siteConfig.social.github },
+    { name: "LinkedIn", icon: Linkedin, href: siteConfig.social.linkedin },
+    { name: "Email", icon: Mail, href: `mailto:${siteConfig.contact.email}` },
+  ].filter((item): item is { name: string; icon: typeof Mail; href: string } =>
+    Boolean(item.href)
+  );
 
   const currentYear = new Date().getFullYear();
 
@@ -97,16 +129,22 @@ export function Footer() {
               <Link href="/" className="inline-flex items-center mb-6 group">
                 <div className="relative">
                   <div className="absolute inset-0 glow-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-                  <img src="/images/code550-logo.png" alt="Code550" className="h-6 md:h-8 relative z-10" />
+                  <Image
+                    src={siteConfig.logo.src}
+                    alt={siteConfig.logo.alt}
+                    width={siteConfig.logo.width}
+                    height={siteConfig.logo.height}
+                    className="h-6 md:h-8 w-auto relative z-10"
+                  />
                 </div>
               </Link>
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 max-w-sm leading-relaxed">
-                Crafting exceptional digital experiences through innovative web development, design, and strategy.
+                {siteConfig.footerDescription}
               </p>
 
               {/* Social Links */}
               <div className="flex gap-3">
-                {navigation.social.map((item) => {
+                {social.map((item) => {
                   const Icon = item.icon;
                   return (
                     <a
@@ -123,45 +161,27 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Services Column */}
-            <div className="lg:col-span-3">
-              <h4 className="font-[family-name:var(--font-display)] text-sm md:text-base mb-4 md:mb-6">
-                Services
-              </h4>
-              <ul className="space-y-2.5 md:space-y-3">
-                {navigation.services.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className="group flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      <ArrowUpRight className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-all duration-200" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Company Column */}
-            <div className="lg:col-span-2">
-              <h4 className="font-[family-name:var(--font-display)] text-sm md:text-base mb-4 md:mb-6">
-                Company
-              </h4>
-              <ul className="space-y-2.5 md:space-y-3">
-                {navigation.company.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className="group flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      <ArrowUpRight className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-all duration-200" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Menu Columns — from the WordPress "footer" menu location */}
+            {columns.map((column) => (
+              <div key={column.title} className="lg:col-span-2">
+                <h4 className="font-[family-name:var(--font-display)] text-sm md:text-base mb-4 md:mb-6">
+                  {column.title}
+                </h4>
+                <ul className="space-y-2.5 md:space-y-3">
+                  {column.links.map((item) => (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className="group flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-all duration-200" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
             {/* Contact Column */}
             <div className="lg:col-span-2">
@@ -174,31 +194,35 @@ export function Footer() {
                     Email
                   </p>
                   <a
-                    href="mailto:hello@code550.com"
+                    href={`mailto:${siteConfig.contact.email}`}
                     className="text-sm text-foreground hover:text-primary transition-colors break-all"
                   >
-                    hello@code550.com
+                    {siteConfig.contact.email}
                   </a>
                 </div>
-                <div>
-                  <p className="text-xs font-mono text-muted-foreground mb-1 uppercase tracking-wider">
-                    Phone
-                  </p>
-                  <a
-                    href="tel:+15551234567"
-                    className="text-sm text-foreground hover:text-primary transition-colors"
-                  >
-                    +1 (555) 123-4567
-                  </a>
-                </div>
-                <div>
-                  <p className="text-xs font-mono text-muted-foreground mb-1 uppercase tracking-wider">
-                    Location
-                  </p>
-                  <p className="text-sm text-foreground">
-                    San Francisco, CA
-                  </p>
-                </div>
+                {siteConfig.contact.phone && (
+                  <div>
+                    <p className="text-xs font-mono text-muted-foreground mb-1 uppercase tracking-wider">
+                      Phone
+                    </p>
+                    <a
+                      href={`tel:${siteConfig.contact.phone.replace(/[^+\d]/g, "")}`}
+                      className="text-sm text-foreground hover:text-primary transition-colors"
+                    >
+                      {siteConfig.contact.phone}
+                    </a>
+                  </div>
+                )}
+                {siteConfig.contact.location && (
+                  <div>
+                    <p className="text-xs font-mono text-muted-foreground mb-1 uppercase tracking-wider">
+                      Location
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {siteConfig.contact.location}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -208,7 +232,7 @@ export function Footer() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
               <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-6 w-full md:w-auto">
                 <div className="text-xs text-muted-foreground font-mono text-center sm:text-left">
-                  &copy; {currentYear} Code550. All rights reserved.
+                  &copy; {currentYear} {siteConfig.copyrightHolder}. All rights reserved.
                 </div>
 
                 {/* Language Selector */}

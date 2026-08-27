@@ -3,7 +3,7 @@ import { LegalPage } from "@/components/pages/legal-page";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy — Code550",
+  title: "Cookie Policy",
 };
 
 export default async function Page() {

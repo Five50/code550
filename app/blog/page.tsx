@@ -3,7 +3,7 @@ import { BlogPage } from "@/components/pages/blog-page";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog — Code550",
+  title: "Blog",
   description: "Insights on web development, SEO, design, and digital strategy.",
 };
 

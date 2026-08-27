@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Footer } from '@/components/layout/footer';
+import { siteConfig } from '@/site.config';
 
 // Mock next/image
 vi.mock('next/image', () => ({
@@ -65,11 +66,23 @@ describe('Footer Component', () => {
     expect(screen.getByText('Cookie Policy')).toBeInTheDocument();
   });
 
-  it('renders social link aria labels', () => {
+  it('renders only the social links configured in site.config', () => {
     render(<Footer />);
-    expect(screen.getByLabelText('Twitter')).toBeInTheDocument();
-    expect(screen.getByLabelText('GitHub')).toBeInTheDocument();
-    expect(screen.getByLabelText('LinkedIn')).toBeInTheDocument();
+
+    // Email is always present; the rest render only when given a URL.
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+
+    for (const [label, href] of [
+      ['Twitter', siteConfig.social.twitter],
+      ['GitHub', siteConfig.social.github],
+      ['LinkedIn', siteConfig.social.linkedin],
+    ] as const) {
+      if (href) {
+        expect(screen.getByLabelText(label)).toBeInTheDocument();
+      } else {
+        expect(screen.queryByLabelText(label)).not.toBeInTheDocument();
+      }
+    }
   });
 
   it('renders the newsletter section', () => {

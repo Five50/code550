@@ -1,18 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Moon, Sun, Menu, X, ArrowRight, Code2, Palette, BarChart3, Layers, MessageSquare, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
+import { siteConfig } from "@/site.config";
+import type { MenuItem } from "@/lib/wordpress.d";
 
 interface HeaderProps {
+  navItems?: MenuItem[];
   onContactClick?: () => void;
 }
 
-export function Header({ onContactClick }: HeaderProps) {
+/** Shown when WordPress has no menu assigned to the "primary" location. */
+const fallbackNavLinks = [
+  { name: "Work", path: "/work" },
+  { name: "About", path: "/about" },
+  { name: "Blog", path: "/blog" },
+];
+
+export function Header({ navItems, onContactClick }: HeaderProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
@@ -28,11 +39,9 @@ export function Header({ onContactClick }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Work", path: "/work" },
-    { name: "About", path: "/about" },
-    { name: "Blog", path: "/blog" },
-  ];
+  const navLinks = navItems?.length
+    ? navItems.map((item) => ({ name: item.title, path: item.url }))
+    : fallbackNavLinks;
 
   const services = [
     {
@@ -83,7 +92,14 @@ export function Header({ onContactClick }: HeaderProps) {
             >
               <div className="relative">
                 <div className="absolute inset-0 glow-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-                <img src="/images/code550-logo.png" alt="Code550" className="h-5 md:h-6 lg:h-7 relative z-10 transition-transform duration-300 group-hover:scale-105" />
+                <Image
+                  src={siteConfig.logo.src}
+                  alt={siteConfig.logo.alt}
+                  width={siteConfig.logo.width}
+                  height={siteConfig.logo.height}
+                  priority
+                  className="h-5 md:h-6 lg:h-7 w-auto relative z-10 transition-transform duration-300 group-hover:scale-105"
+                />
               </div>
             </Link>
 
